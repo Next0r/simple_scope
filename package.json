@@ -1,0 +1,23 @@
+{
+  "name": "simple_scope",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ./src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Next0r/simple_scope.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Next0r/simple_scope/issues"
+  },
+  "homepage": "https://github.com/Next0r/simple_scope#readme",
+  "devDependencies": {
+    "electron": "^12.0.7"
+  }
+}
