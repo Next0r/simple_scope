@@ -1,16 +1,38 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <title>Hello World!</title>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'">
-</head>
-<body style="background: white;">
-    <h1>Hello World!</h1>
-    <p>
-        We are using Node.js <span id="node-version"></span>,
-        Chromium <span id="chrome-version"></span>,
-        and Electron <span id="electron-version"></span>.
-    </p>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Simple Scope</title>
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'unsafe-inline'"
+    />
+  </head>
+  <body style="background-color: white">
+    <div>
+      <button id="scan-ports-button">Scan ports</button>
+    </div>
+
+    <div>
+      <span>Select port:</span>
+      <select id="select-port-list">
+        <option>---</option>
+      </select>
+    </div>
+
+    <div><span>Baud rate:</span><input id="baud-rate" type="text" value="9600" disabled/></div>
+
+    <div>
+      <button id="connect-button" disabled>Connect</button>
+    </div>
+    <div>
+      <button id="disconnect-button" disabled>Disconnect</button>
+    </div>
+
+    <div><span>Voltage: </span><span id="voltage">-</span></div>
+    <div><span>Voltage min: </span><span id="voltage-min">-</span></div>
+    <div><span>Voltage max: </span><span id="voltage-max">-</span></div>
+
+    <script src="main.js"></script>
+  </body>
 </html>
