@@ -1,245 +1,110 @@
 const SerialPort = require("serialport");
-const path = require("path");
-const { fork } = require("child_process");
+const gui = require("./gui");
+const multiThreading = require("./multi-threading");
 
-const childProcess = fork(path.join(__dirname, "serial-data-processor.js"));
+const main = async () => {
+  const serialDataProcessor = multiThreading.createSerialDataProcessor();
 
+  let voltageSample = [];
+  let voltSampleTimeStart = new Date().getTime();
+  let voltSampleTimeEnd = new Date().getTime();
 
-childProcess.on("exit", (code) => {
-  console.log(`Child process exited with code ${code}`);
-});
+  serialDataProcessor.on("message", (message) => {
+    if (message.data) {
+      gui.setVoltage(message.data[0]);
+      voltageSample = message.data;
+      voltSampleTimeStart = voltSampleTimeEnd;
+      voltSampleTimeEnd = new Date().getTime();
+    }
+  });
 
-process.on("beforeExit", () => {
-  childProcess.kill();
-});
+  setInterval(() => {
+    const chartData = [];
+    const sampleSize = voltageSample.length;
+    const timeStep = (voltSampleTimeEnd - voltSampleTimeStart) / sampleSize;
 
-childProcess.on("error", (err) => {
-  console.log(err.message);
-});
+    gui.setSamplesPerSec(
+      (sampleSize / (voltSampleTimeEnd - voltSampleTimeStart)) * 1000
+    );
 
-const readingsBuffer = [];
+    for (let i = 0; i < sampleSize - 1; i += 1) {
+      chartData.push({
+        value: [timeStep * i, voltageSample[i]],
+      });
+    }
 
-childProcess.on("message", (message) => {
-  if (message.info) {
-    return console.log(message.info);
-  }
+    gui.updateChart(chartData);
+  }, 1000);
 
-  const readings = message.readings;
+  gui.init();
 
-  console.log(`Received ${readings.length} processed values.`);
-
-  document.querySelector("#voltage").textContent = readings[0];
-});
-
-const addPortSelectOption = (value = "COM1") => {
-  const selectElement = document.querySelector("#select-port-list");
-
-  const option = document.createElement("option");
-  option.value = value;
-  option.innerText = value;
-
-  selectElement.appendChild(option);
-};
-
-const clearPortSelectElement = () => {
-  document.querySelector("#select-port-list").innerHTML = "";
-};
-
-const enableConnectButton = () => {
-  document.querySelector("#connect-button").removeAttribute("disabled");
-};
-
-const disableConnectButton = () => {
-  document.querySelector("#connect-button").setAttribute("disabled", "true");
-};
-
-const enableBuadRateInput = () => {
-  document.querySelector("#baud-rate").removeAttribute("disabled");
-};
-
-const disableBuadRateInput = () => {
-  document.querySelector("#baud-rate").setAttribute("disabled", "true");
-};
-
-const enableDisconnectButton = () => {
-  document.querySelector("#disconnect-button").removeAttribute("disabled");
-};
-
-const disableDisconnectButton = () => {
-  document.querySelector("#disconnect-button").setAttribute("disabled", "true");
-};
-
-document
-  .querySelector("#scan-ports-button")
-  .addEventListener("click", async () => {
+  gui.events.onScanPortsClick = async () => {
     const ports = await SerialPort.list();
 
-    if (ports.length < 0) {
-      return;
-    }
-
-    enableConnectButton();
-    enableBuadRateInput();
-    clearPortSelectElement();
+    const paths = [];
 
     for (let port of ports) {
-      addPortSelectOption(port.path);
-    }
-  });
-
-/**
- * @type {SerialPort}
- */
-let portConnected = null;
-
-document.querySelector("#disconnect-button").addEventListener("click", () => {
-  if (portConnected === null) {
-    return;
-  }
-
-  portConnected.close((err) => {
-    if (err) {
-      return console.log(err.message);
-    }
-  });
-
-  enableBuadRateInput();
-  enableConnectButton();
-  disableDisconnectButton();
-});
-
-document.querySelector("#connect-button").addEventListener("click", () => {
-  const portName = document.querySelector("#select-port-list").value;
-  const baudRate = document.querySelector("#baud-rate").value;
-
-  const port = new SerialPort(portName, { baudRate: parseInt(baudRate) });
-
-  port.on("open", (err) => {
-    if (err) {
-      return console.log(err.message);
+      paths.push(port.path);
     }
 
-    disableConnectButton();
-    disableBuadRateInput();
+    return paths;
+  };
 
-    enableDisconnectButton();
+  /**
+   * @type {SerialPort}
+   */
+  let port = null;
 
-    portConnected = port;
-  });
+  gui.events.onDisconnectClick = () => {
+    return new Promise((resolve, reject) => {
+      if (port === null) {
+        reject(false);
+      }
+
+      port.close((err) => {
+        if (err) {
+          console.log(err.message);
+          reject(false);
+        }
+
+        console.log(`Disconnected from port ${port.path}`);
+
+        resolve(true);
+      });
+    });
+  };
 
   let recBuffer = [];
+  const chunkSize = 256;
 
-  port.on("data", (data) => {
-    recBuffer.push(...data);
+  gui.events.onConnectClick = () => {
+    return new Promise((resolve, reject) => {
+      const baudRate = gui.getBaudRate();
+      const path = gui.getSelectedPort();
 
-    if (recBuffer.length >= 256) {
-      childProcess.send({ serialPortData: recBuffer });
-      console.log(`Sending chunk of size ${recBuffer.length}B`);
+      port = new SerialPort(path, { baudRate: baudRate });
 
-      recBuffer = [];
-    }
-  });
-});
+      port.on("data", (data) => {
+        recBuffer.push(...data);
 
-// const worker = new Worker(path.join(__dirname, "serial-data-processor.js"));
+        if (recBuffer.length >= chunkSize) {
+          serialDataProcessor.send({ serialPortData: recBuffer });
+          recBuffer = [];
+        }
+      });
 
-// worker.postMessage({ serialData: [1, 2, 3, 4, 5] });
+      port.on("open", (err) => {
+        if (err) {
+          console.log(err.message);
+          reject(false);
+        }
 
-// worker.on("message", (message) => {
-//   console.log(message);
-// });
+        console.log(`Connected to port ${path}`);
 
-// const Chart = require("chart.js").Chart;
+        resolve(true);
+      });
+    });
+  };
+};
 
-// const canvas = document.querySelector("#my-chart");
-// scope.setCanvas(canvas);
-
-// scope.setYLabels(["0", "1", "2", "3", "4", "5"]);
-// scope.setLabelsXOffset(-5);
-// scope._drawLabels();
-// scope._drawLine();
-
-// const port = new SerialPort("COM3", { baudRate: 9615 }, (err) => {
-//   if (err) {
-//     return console.log(err.message);
-//   }
-// });
-
-// port.open((err) => {
-//   if (err) {
-//     return console.log(err.message);
-//   }
-// });
-
-// const sampleSpeed = 122; // 100 samples per sec
-// const timeRange = 10; // 10 sec capture
-
-// const chartData = [];
-
-// // resize data buffer to sample speed * time range
-// for (let i = 0; i < sampleSpeed * timeRange; i += 1) {
-//   chartData.push(0);
-// }
-
-// let labels = [];
-// for (let i = 0; i < chartData.length; i += 1) {
-//   labels.push(i / sampleSpeed);
-// }
-
-// // create chart
-// const ctx = document.getElementById("my-chart").getContext("2d");
-
-// let chart = new Chart(ctx, {
-//   type: "line",
-//   data: {
-//     labels: labels,
-//     datasets: [
-//       {
-//         label: "Chart ",
-//         data: chartData,
-//       },
-//     ],
-//   },
-//   options: {
-//     scales: {
-//       x: {
-//         type: "linear",
-//         position: "bottom",
-//       },
-//     },
-//     // animation: false,
-//     spanGaps: true,
-//   },
-// });
-
-// let recBuffer = [];
-
-// port.on("data", (data) => {
-//   recBuffer.push(...data);
-
-//   while (recBuffer.length > 3) {
-//     if (recBuffer[0] === 0x0a) {
-//       const result = ((recBuffer[1] | (recBuffer[2] << 8)) / 4096) * 5;
-
-//       chartData.push(result);
-//       chartData.shift();
-
-//       //   chart.data.datasets[0].data = chartData;
-//       //   chart.update();
-
-//       recBuffer = recBuffer.slice(3);
-
-//       //   console.log(result);
-//     } else {
-//       console.log("ERROR!");
-//       recBuffer.shift();
-//     }
-
-//     // console.log(chartData[1000]);
-//   }
-// });
-
-// setInterval(() => {
-//   chart.data.datasets[0].data = new Array(...chartData);
-//   chart.update();
-// }, 100);
+main();

@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "chart.js": "^3.2.1",
+    "echarts": "^5.1.1",
     "serialport": "^9.0.7"
   }
 }

@@ -30,11 +30,11 @@ const processMessage = (data) => {
 
   // clean buffer if it was not sliced
   // max two bytes may remain (frame start and byte L)
-  if(serialPortDataBuffer.length > 2){
-      serialPortDataBuffer.length = [];
+  if (serialPortDataBuffer.length > 2) {
+    serialPortDataBuffer.length = [];
   }
 
-  process.send({ readings: values });
+  process.send({ data: values });
 };
 
 process.on("message", (message) => {

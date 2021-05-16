@@ -20,7 +20,10 @@
       </select>
     </div>
 
-    <div><span>Baud rate:</span><input id="baud-rate" type="text" value="9600" disabled/></div>
+    <div>
+      <span>Baud rate:</span
+      ><input id="baud-rate" type="text" value="115900" disabled />
+    </div>
 
     <div>
       <button id="connect-button" disabled>Connect</button>
@@ -29,9 +32,12 @@
       <button id="disconnect-button" disabled>Disconnect</button>
     </div>
 
+    <div><span>Samples per second: </span><span id="samples-per-second">-</span></div>
     <div><span>Voltage: </span><span id="voltage">-</span></div>
     <div><span>Voltage min: </span><span id="voltage-min">-</span></div>
     <div><span>Voltage max: </span><span id="voltage-max">-</span></div>
+
+    <div id="chart" style="width: 600px; height: 400px"></div>
 
     <script src="main.js"></script>
   </body>
