@@ -5,40 +5,74 @@ const gui = {
     /**
      * @type {HTMLSelectElement}
      */
-    portSelectElement: null,
+    portSelectElement: undefined,
     /**
      * @type {HTMLButtonElement}
      */
-    connectButton: null,
+    connectButton: undefined,
     /**
      * @type {HTMLButtonElement}
      */
-    disconnectButton: null,
+    disconnectButton: undefined,
     /**
      * @type {HTMLInputElement}
      */
-    baudRateInput: null,
+    baudRateInput: undefined,
     /**
      * @type {HTMLButtonElement}
      */
-    scanPortsButton: null,
+    scanPortsButton: undefined,
     /**
      * @type {HTMLSpanElement}
      */
-    voltageSpan: null,
+    voltageSpan: undefined,
     /**
      * @type {HTMLDivElement}
      */
-    chartDiv: null,
-    /**
-     * @type {echarts.ECharts}
-     */
-    chart: null,
+    voltageChartDiv: undefined,
+
     /**
      * @type {HTMLSpanElement}
      */
-    samplesPerSecSpan: null,
+    samplesPerSecSpan: undefined,
+    /**
+     * @type {HTMLSpanElement}
+     */
+    voltageMinSpan: undefined,
+    /**
+     * @type {HTMLSpanElement}
+     */
+    voltageMaxSpan: undefined,
+    /**
+     * @type {HTMLInputElement}
+     */
+    referenceVoltageInput: undefined,
+    /**
+     * @type {HTMLDivElement}
+     */
+    currentChartDiv: undefined,
+    /**
+     * @type {HTMLInputElement}
+     */
+    offsetVoltageInput: undefined,
+    /**
+     * @type {HTMLInputElement}
+     */
+    acVoltageReference: undefined,
+    /**
+     * @type {HTMLInputElement}
+     */
+    useGainCheckbox: undefined,
   },
+
+  /**
+   * @type {echarts.ECharts}
+   */
+  _voltageChart: undefined,
+  /**
+   * @type {echarts.ECharts}
+   */
+  _currentChart: undefined,
 
   events: {
     onConnectClick: () => {},
@@ -47,19 +81,21 @@ const gui = {
   },
 
   _setHTMLElementsReferences() {
-    this._elements.portSelectElement =
-      document.querySelector("#select-port-list");
+    this._elements.portSelectElement = document.querySelector("#select-port-list");
     this._elements.connectButton = document.querySelector("#connect-button");
-    this._elements.disconnectButton =
-      document.querySelector("#disconnect-button");
+    this._elements.disconnectButton = document.querySelector("#disconnect-button");
     this._elements.baudRateInput = document.querySelector("#baud-rate");
-    this._elements.scanPortsButton =
-      document.querySelector("#scan-ports-button");
+    this._elements.scanPortsButton = document.querySelector("#scan-ports-button");
     this._elements.voltageSpan = document.querySelector("#voltage");
-    this._elements.chartDiv = document.querySelector("#chart");
-    this._elements.samplesPerSecSpan = document.querySelector(
-      "#samples-per-second"
-    );
+    this._elements.voltageChartDiv = document.querySelector("#voltage-chart");
+    this._elements.samplesPerSecSpan = document.querySelector("#samples-per-second");
+    this._elements.voltageMinSpan = document.querySelector("#voltage-min");
+    this._elements.voltageMaxSpan = document.querySelector("#voltage-max");
+    this._elements.referenceVoltageInput = document.querySelector("#reference-voltage");
+    this._elements.currentChartDiv = document.querySelector("#current-chart");
+    this._elements.offsetVoltageInput = document.querySelector("#offset-voltage");
+    this._elements.acVoltageReference = document.querySelector("#ac-voltage-reference");
+    this._elements.useGainCheckbox = document.querySelector("#use-gain");
   },
 
   _setEventListeners() {
@@ -102,12 +138,20 @@ const gui = {
       this._elements.connectButton.disabled = false;
       this._elements.disconnectButton.disabled = false;
     });
+
+    this._elements.useGainCheckbox.addEventListener("change", () => {
+      const checked = this._elements.useGainCheckbox.checked;
+
+      if (checked) {
+        this._elements.acVoltageReference.disabled = true;
+      } else {
+        this._elements.acVoltageReference.disabled = false;
+      }
+    });
   },
 
-  _initializeCharts() {
-    this._elements.chart = echarts.init(this._elements.chartDiv);
-
-    const option = {
+  _createChartOption() {
+    return {
       xAxis: {
         type: "value",
       },
@@ -122,11 +166,23 @@ const gui = {
         },
       ],
     };
-
-    this._elements.chart.setOption(option);
   },
 
-  updateChart(data) {
+  _initializeCharts() {
+    this._voltageChart = echarts.init(this._elements.voltageChartDiv);
+    this._currentChart = echarts.init(this._elements.currentChartDiv);
+
+    this._voltageChart.setOption(this._createChartOption());
+    this._currentChart.setOption(this._createChartOption());
+  },
+
+  fakeDisconnectClick() {
+    this._elements.disconnectButton.disabled = true;
+    this._elements.connectButton.disabled = false;
+    this._elements.baudRateInput.disabled = false;
+  },
+
+  updateVoltageChart(data) {
     const option = {
       series: [
         {
@@ -135,7 +191,19 @@ const gui = {
       ],
     };
 
-    this._elements.chart.setOption(option);
+    this._voltageChart.setOption(option);
+  },
+
+  updateCurrentChart(data) {
+    const option = {
+      series: [
+        {
+          data: data,
+        },
+      ],
+    };
+
+    this._currentChart.setOption(option);
   },
 
   getSelectedPort() {
@@ -146,12 +214,36 @@ const gui = {
     return parseInt(this._elements.baudRateInput.value);
   },
 
+  getReferenceVoltage() {
+    return parseFloat(this._elements.referenceVoltageInput.value);
+  },
+
+  getOffsetVoltage() {
+    return parseFloat(this._elements.offsetVoltageInput.value);
+  },
+
+  getACVoltageReference() {
+    return parseFloat(this._elements.acVoltageReference.value);
+  },
+
+  getUseGain() {
+    return this._elements.useGainCheckbox.checked;
+  },
+
   setVoltage(value = 0) {
     this._elements.voltageSpan.innerText = value;
   },
 
   setSamplesPerSec(value = 0) {
     this._elements.samplesPerSecSpan.innerText = value;
+  },
+
+  setVoltageMin(value = 0) {
+    this._elements.voltageMinSpan.innerText = value;
+  },
+
+  setVoltageMax(value = 0) {
+    this._elements.voltageMaxSpan.innerText = value;
   },
 
   init() {

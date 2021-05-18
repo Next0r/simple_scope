@@ -3,9 +3,7 @@ const { fork } = require("child_process");
 
 const multiThreading = {
   createSerialDataProcessor() {
-    const serialDataProcessor = fork(
-      path.join(__dirname, "serial-data-processor.js")
-    );
+    const serialDataProcessor = fork(path.join(__dirname, "serial-data-processor.js"));
 
     serialDataProcessor.on("error", (err) => {
       console.log(err.message);

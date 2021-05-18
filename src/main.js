@@ -1,110 +1,132 @@
 const SerialPort = require("serialport");
 const gui = require("./gui");
 const multiThreading = require("./multi-threading");
+const SerialDataProcessorMessage = require("./serial-data-processor-message");
 
-const main = async () => {
-  const serialDataProcessor = multiThreading.createSerialDataProcessor();
-
-  let voltageSample = [];
-  let voltSampleTimeStart = new Date().getTime();
-  let voltSampleTimeEnd = new Date().getTime();
-
-  serialDataProcessor.on("message", (message) => {
-    if (message.data) {
-      gui.setVoltage(message.data[0]);
-      voltageSample = message.data;
-      voltSampleTimeStart = voltSampleTimeEnd;
-      voltSampleTimeEnd = new Date().getTime();
-    }
-  });
-
-  setInterval(() => {
-    const chartData = [];
-    const sampleSize = voltageSample.length;
-    const timeStep = (voltSampleTimeEnd - voltSampleTimeStart) / sampleSize;
-
-    gui.setSamplesPerSec(
-      (sampleSize / (voltSampleTimeEnd - voltSampleTimeStart)) * 1000
-    );
-
-    for (let i = 0; i < sampleSize - 1; i += 1) {
-      chartData.push({
-        value: [timeStep * i, voltageSample[i]],
-      });
-    }
-
-    gui.updateChart(chartData);
-  }, 1000);
-
-  gui.init();
-
-  gui.events.onScanPortsClick = async () => {
-    const ports = await SerialPort.list();
-
-    const paths = [];
-
-    for (let port of ports) {
-      paths.push(port.path);
-    }
-
-    return paths;
-  };
-
+const simpleScope = {
   /**
    * @type {SerialPort}
    */
-  let port = null;
+  _port: undefined,
+  _dataBuffer: [],
+  _chunkSize: 256,
+  _serialDataProcessor: undefined,
+  _lastSampleTime: 0,
 
-  gui.events.onDisconnectClick = () => {
-    return new Promise((resolve, reject) => {
-      if (port === null) {
-        reject(false);
+  _setConnectEvent() {
+    gui.events.onConnectClick = () => {
+      return new Promise((resolve) => {
+        const baudRate = gui.getBaudRate();
+        const path = gui.getSelectedPort();
+
+        this._port = new SerialPort(path, { baudRate: baudRate }, (err) => {
+          if (err) {
+            console.warn(err.message);
+            resolve(false);
+          }
+        });
+
+        this._port.on("close", (err) => {
+          if (err) {
+            console.warn(err.message);
+          }
+          gui.fakeDisconnectClick();
+        });
+
+        this._port.on("data", (data) => {
+          this._dataBuffer.push(...data);
+
+          // send chunk of serial port data for processing to child process
+          if (this._dataBuffer.length >= this._chunkSize) {
+            this._serialDataProcessor.send(
+              new SerialDataProcessorMessage({
+                serialData: this._dataBuffer,
+                referenceVoltage: gui.getReferenceVoltage(),
+              })
+            );
+            this._dataBuffer = [];
+          }
+        });
+
+        this._port.on("open", (err) => {
+          if (err) {
+            console.warn(err.message);
+            resolve(false);
+          }
+
+          console.log(`Connected to port ${path}`);
+          resolve(true);
+        });
+      });
+    };
+  },
+
+  _setDisconnectEvent() {
+    gui.events.onDisconnectClick = async () => {
+      return new Promise((resolve) => {
+        if (!this._port) {
+          console.warn("Connection not established");
+          resolve(true);
+        }
+
+        this._port.close((err) => {
+          if (err) {
+            console.warn(err.message);
+            resolve(false);
+          }
+
+          console.log(`Disconnected from port ${this._port.path}`);
+          resolve(true);
+        });
+      });
+    };
+  },
+
+  _setScanPortsEvent() {
+    gui.events.onScanPortsClick = async () => {
+      const ports = await SerialPort.list();
+
+      const paths = [];
+
+      for (let port of ports) {
+        paths.push(port.path);
       }
 
-      port.close((err) => {
-        if (err) {
-          console.log(err.message);
-          reject(false);
-        }
+      return paths;
+    };
+  },
 
-        console.log(`Disconnected from port ${port.path}`);
+  /**
+   * @param {SerialDataProcessorMessage} message
+   */
+  _processSerialDataProcessorMessage(message) {
+    if (!message.voltages) {
+      return;
+    }
 
-        resolve(true);
-      });
+    const voltageASample = message.voltages[0];
+    const voltageBSample = message.voltages[1];
+
+    this._lastSampleTime = new Date().getTime();
+
+    gui.setVoltage(voltageASample[0]);
+    gui.setVoltageMax(voltageBSample[0]);
+  },
+
+  _startSerialDataProcessor() {
+    this._serialDataProcessor = multiThreading.createSerialDataProcessor();
+    this._serialDataProcessor.on("message", (message) => {
+      this._processSerialDataProcessorMessage(message);
     });
-  };
+  },
 
-  let recBuffer = [];
-  const chunkSize = 256;
-
-  gui.events.onConnectClick = () => {
-    return new Promise((resolve, reject) => {
-      const baudRate = gui.getBaudRate();
-      const path = gui.getSelectedPort();
-
-      port = new SerialPort(path, { baudRate: baudRate });
-
-      port.on("data", (data) => {
-        recBuffer.push(...data);
-
-        if (recBuffer.length >= chunkSize) {
-          serialDataProcessor.send({ serialPortData: recBuffer });
-          recBuffer = [];
-        }
-      });
-
-      port.on("open", (err) => {
-        if (err) {
-          console.log(err.message);
-          reject(false);
-        }
-
-        console.log(`Connected to port ${path}`);
-
-        resolve(true);
-      });
-    });
-  };
+  main() {
+    gui.init();
+    this._startSerialDataProcessor();
+    this._setScanPortsEvent();
+    this._setDisconnectEvent();
+    this._setConnectEvent();
+  },
 };
 
-main();
+simpleScope.main();
