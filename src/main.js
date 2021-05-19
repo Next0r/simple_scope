@@ -12,6 +12,10 @@ const simpleScope = {
   _chunkSize: 256,
   _serialDataProcessor: undefined,
   _lastSampleTime: 0,
+  _opAmpGain: 0.004994506043, // 10K / (1M + 1M + 2K2)
+  _lastVoltageASamples: undefined,
+  _chartsUpdateIntervalHandler: undefined,
+  _chartsUpdateInterval: 1000,
 
   _setConnectEvent() {
     gui.events.onConnectClick = () => {
@@ -96,6 +100,53 @@ const simpleScope = {
     };
   },
 
+  _createVoltageData(voltageSamples = []) {
+    const opAmpOffset = gui.getOffsetVoltage();
+    const referenceACVoltage = gui.getACVoltageReference();
+    const useGain = gui.getUseGain();
+    const timeStep = 1 / gui.getMCUSamplingSpeed(); // ms per sample
+    const gain = this._opAmpGain;
+
+    const voltageData = [];
+
+    if (useGain) {
+      voltageSamples.forEach((sample, index) => {
+        voltageData.push({ value: [index * timeStep, (sample - opAmpOffset) / gain] });
+      });
+    } else {
+      let voltageMax = voltageSamples[0];
+      let voltageMin = voltageSamples[0];
+
+      voltageSamples.forEach((sample, index) => {
+        if (sample < voltageMin) {
+          voltageMin = sample;
+        } else if (sample > voltageMax) {
+          voltageMax = sample;
+        }
+      });
+
+      const neutral = (voltageMax - voltageMin) / 2;
+      voltageMax -= neutral;
+      const voltagePeak = referenceACVoltage * Math.sqrt(2);
+
+      voltageSamples.forEach((sample, index) => {
+        voltageData.push({
+          value: [index * timeStep, ((sample - neutral) / voltageMax) * voltagePeak],
+        });
+      });
+    }
+
+    return voltageData;
+  },
+
+  _setChartsUpdateInterval() {
+    this._chartsUpdateIntervalHandler = setInterval(() => {
+      if (this._lastVoltageASamples) {
+        gui.updateVoltageChart(this._createVoltageData(this._lastVoltageASamples));
+      }
+    }, this._chartsUpdateInterval);
+  },
+
   /**
    * @param {SerialDataProcessorMessage} message
    */
@@ -103,6 +154,8 @@ const simpleScope = {
     if (!message.voltages) {
       return;
     }
+
+    this._lastVoltageASamples = message.voltages[0];
 
     const voltageASample = message.voltages[0];
     const voltageBSample = message.voltages[1];
@@ -126,6 +179,7 @@ const simpleScope = {
     this._setScanPortsEvent();
     this._setDisconnectEvent();
     this._setConnectEvent();
+    this._setChartsUpdateInterval();
   },
 };
 

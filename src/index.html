@@ -31,13 +31,18 @@
     </div>
 
     <div>
+      <span>MCU sampling speed:</span>
+      <input id="mcu-sampling-speed" type="text" value="1000" />
+    </div>
+
+    <div>
       <span>ADC Reference voltage: </span>
       <input id="reference-voltage" type="text" value="5.00" />
     </div>
 
     <div>
       <span>Summing amplifier offset voltage:</span>
-      <input id="offset-voltage" type="text" , value="2.50" />
+      <input id="offset-voltage" type="text" , value="2.50" disabled/>
     </div>
 
     <div>
@@ -49,6 +54,17 @@
       <span>Use op-amp gain instead AC reference:</span>
       <input id="use-gain" type="checkbox" />
     </div>
+
+    <div>
+      <span>Filter outliers:</span>
+      <input id="use-filter" type="checkbox" />
+    </div>
+
+    <!-- <div>
+      <span>Filter factor:</span>
+      <input id="ac-voltage-reference" type="text" value="5" />
+    </div> -->
+
 
     <div><span>Samples per second: </span><span id="samples-per-second">-</span></div>
     <div><span>Voltage: </span><span id="voltage">-</span></div>

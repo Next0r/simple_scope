@@ -63,6 +63,10 @@ const gui = {
      * @type {HTMLInputElement}
      */
     useGainCheckbox: undefined,
+    /**
+     * @type {HTMLInputElement}
+     */
+    mcuSamplingSpeed: undefined,
   },
 
   /**
@@ -96,6 +100,7 @@ const gui = {
     this._elements.offsetVoltageInput = document.querySelector("#offset-voltage");
     this._elements.acVoltageReference = document.querySelector("#ac-voltage-reference");
     this._elements.useGainCheckbox = document.querySelector("#use-gain");
+    this._elements.mcuSamplingSpeed = document.querySelector("#mcu-sampling-speed");
   },
 
   _setEventListeners() {
@@ -144,8 +149,10 @@ const gui = {
 
       if (checked) {
         this._elements.acVoltageReference.disabled = true;
+        this._elements.offsetVoltageInput.disabled = false;
       } else {
         this._elements.acVoltageReference.disabled = false;
+        this._elements.offsetVoltageInput.disabled = true;
       }
     });
   },
@@ -228,6 +235,10 @@ const gui = {
 
   getUseGain() {
     return this._elements.useGainCheckbox.checked;
+  },
+
+  getMCUSamplingSpeed() {
+    return parseInt(this._elements.mcuSamplingSpeed.value);
   },
 
   setVoltage(value = 0) {
