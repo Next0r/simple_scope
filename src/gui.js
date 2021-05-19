@@ -70,7 +70,15 @@ const gui = {
     /**
      * @type {HTMLInputElement}
      */
-    useFilter: undefined,
+    useFilterCheckbox: undefined,
+    /**
+     * @type {HTMLInputElement}
+     */
+    opAmpGainInput: undefined,
+    /**
+     * @type {HTMLInputElement}
+     */
+    halfOffsetCheckbox: undefined,
   },
 
   /**
@@ -105,7 +113,9 @@ const gui = {
     this._elements.acVoltageReference = document.querySelector("#ac-voltage-reference");
     this._elements.useGainCheckbox = document.querySelector("#use-gain");
     this._elements.mcuSamplingSpeed = document.querySelector("#mcu-sampling-speed");
-    this._elements.useFilter = document.querySelector("#use-filter");
+    this._elements.useFilterCheckbox = document.querySelector("#use-filter");
+    this._elements.opAmpGainInput = document.querySelector("#op-amp-gain");
+    this._elements.halfOffsetCheckbox = document.querySelector("#half-offset");
   },
 
   _setEventListeners() {
@@ -155,9 +165,23 @@ const gui = {
       if (checked) {
         this._elements.acVoltageReference.disabled = true;
         this._elements.offsetVoltageInput.disabled = false;
+        this._elements.opAmpGainInput.disabled = false;
+        this._elements.halfOffsetCheckbox.disabled = false;
       } else {
         this._elements.acVoltageReference.disabled = false;
         this._elements.offsetVoltageInput.disabled = true;
+        this._elements.opAmpGainInput.disabled = true;
+        this._elements.halfOffsetCheckbox.disabled = true;
+      }
+    });
+
+    this._elements.halfOffsetCheckbox.addEventListener("change", () => {
+      const checked = this._elements.halfOffsetCheckbox.checked;
+
+      if (checked) {
+        this._elements.offsetVoltageInput.disabled = true;
+      } else {
+        this._elements.offsetVoltageInput.disabled = false;
       }
     });
   },
@@ -247,7 +271,15 @@ const gui = {
   },
 
   getUseFilter() {
-    return this._elements.useFilter.checked;
+    return this._elements.useFilterCheckbox.checked;
+  },
+
+  getOpAmpGain() {
+    return parseFloat(this._elements.opAmpGainInput.value);
+  },
+
+  getHalfOffset() {
+    return this._elements.halfOffsetCheckbox.checked;
   },
 
   setVoltage(value = 0) {
