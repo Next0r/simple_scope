@@ -2,6 +2,7 @@ const SerialPort = require("serialport");
 const gui = require("./gui");
 const multiThreading = require("./multi-threading");
 const SerialDataProcessorMessage = require("./serial-data-processor-message");
+const hampel = require("./hampel");
 
 const simpleScope = {
   /**
