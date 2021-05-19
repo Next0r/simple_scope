@@ -1,11 +1,8 @@
 /**
  * Applies Hampel Filter to provided dataset
- * @param {[]} dataset Numerical dataset to be filtered
- * @param {Number} windowSize Integer value that represents half of window width - whole window = 2 * windowSize + 1
- * @param {Number} nSigmas Filtering factor that should be greater than 0, makes algorithm more forgiving
  * @returns Filtered dataset
  */
-const hampel = (dataset = [], windowSize = 3, nSigmas = 3) => {
+const hampel = (dataset = [], { windowSize = 3, nSigmas = 3, cutoff = false } = {}) => {
   /**
    * Provides median of given dataset
    */
@@ -52,6 +49,10 @@ const hampel = (dataset = [], windowSize = 3, nSigmas = 3) => {
     if (dataset[i] > m + s || dataset[i] < m - s) {
       dataset[i] = m;
     }
+  }
+
+  if (cutoff) {
+    return dataset.slice(windowSize, dataset.length - windowSize);
   }
 
   return dataset;

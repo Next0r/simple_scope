@@ -67,6 +67,10 @@ const gui = {
      * @type {HTMLInputElement}
      */
     mcuSamplingSpeed: undefined,
+    /**
+     * @type {HTMLInputElement}
+     */
+    useFilter: undefined,
   },
 
   /**
@@ -101,6 +105,7 @@ const gui = {
     this._elements.acVoltageReference = document.querySelector("#ac-voltage-reference");
     this._elements.useGainCheckbox = document.querySelector("#use-gain");
     this._elements.mcuSamplingSpeed = document.querySelector("#mcu-sampling-speed");
+    this._elements.useFilter = document.querySelector("#use-filter");
   },
 
   _setEventListeners() {
@@ -239,6 +244,10 @@ const gui = {
 
   getMCUSamplingSpeed() {
     return parseInt(this._elements.mcuSamplingSpeed.value);
+  },
+
+  getUseFilter() {
+    return this._elements.useFilter.checked;
   },
 
   setVoltage(value = 0) {

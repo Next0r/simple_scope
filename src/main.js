@@ -10,7 +10,7 @@ const simpleScope = {
    */
   _port: undefined,
   _dataBuffer: [],
-  _chunkSize: 256,
+  _chunkSize: 512,
   _serialDataProcessor: undefined,
   _lastSampleTime: 0,
   _opAmpGain: 0.004994506043, // 10K / (1M + 1M + 2K2)
@@ -108,17 +108,22 @@ const simpleScope = {
     const timeStep = 1 / gui.getMCUSamplingSpeed(); // ms per sample
     const gain = this._opAmpGain;
 
+    let samples = voltageSamples;
+    if (gui.getUseFilter()) {
+      samples = hampel(voltageSamples, { cutoff: true });
+    }
+
     const voltageData = [];
 
     if (useGain) {
-      voltageSamples.forEach((sample, index) => {
+      samples.forEach((sample, index) => {
         voltageData.push({ value: [index * timeStep, (sample - opAmpOffset) / gain] });
       });
     } else {
-      let voltageMax = voltageSamples[0];
-      let voltageMin = voltageSamples[0];
+      let voltageMax = samples[0];
+      let voltageMin = samples[0];
 
-      voltageSamples.forEach((sample, index) => {
+      samples.forEach((sample, index) => {
         if (sample < voltageMin) {
           voltageMin = sample;
         } else if (sample > voltageMax) {
@@ -130,7 +135,7 @@ const simpleScope = {
       voltageMax -= neutral;
       const voltagePeak = referenceACVoltage * Math.sqrt(2);
 
-      voltageSamples.forEach((sample, index) => {
+      samples.forEach((sample, index) => {
         voltageData.push({
           value: [index * timeStep, ((sample - neutral) / voltageMax) * voltagePeak],
         });
