@@ -25,7 +25,7 @@ const serialDataProcessor = {
       voltages.push([]);
     }
 
-    for (let i = 0; i < this._dataBuffer.length - 1; i += 1) {
+    for (let i = 0; i < this._dataBuffer.length; i += 1) {
       const header = this._dataBuffer[i];
       const byteL = this._dataBuffer[i + 1];
       const byteH = this._dataBuffer[i + 2];

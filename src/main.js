@@ -3,6 +3,7 @@ const gui = require("./gui");
 const multiThreading = require("./multi-threading");
 const SerialDataProcessorMessage = require("./serial-data-processor-message");
 const hampel = require("./hampel");
+const calculatePower = require("./calculate-power");
 
 const simpleScope = {
   /**
@@ -16,7 +17,7 @@ const simpleScope = {
   _lastVoltageSamples: undefined,
   _chartsUpdateIntervalHandler: undefined,
   _chartsUpdateInterval: 1000,
-  _acs723VoltPerAmper: 0.4,
+  _acs723VoltPerAmpere: 0.4,
 
   _setConnectEvent() {
     gui.events.onConnectClick = () => {
@@ -165,7 +166,7 @@ const simpleScope = {
 
   _createCurrentData(voltageSamples = []) {
     const timeStep = 1 / gui.getMCUSamplingSpeed(); // ms per sample
-    const voltPerAmper = this._acs723VoltPerAmper;
+    const voltPerAmpere = this._acs723VoltPerAmpere;
 
     let samples = voltageSamples;
     if (gui.getUseFilter()) {
@@ -189,7 +190,7 @@ const simpleScope = {
     const center = (min + max) * 0.5;
 
     samples.forEach((sample, index) => {
-      const realCurrentValue = (sample - center) / voltPerAmper;
+      const realCurrentValue = (sample - center) / voltPerAmpere;
 
       currentDataRaw.push(realCurrentValue);
       currentData.push({
@@ -197,8 +198,8 @@ const simpleScope = {
       });
     });
 
-    const currentMin = (min - center) / voltPerAmper;
-    const currentMax = (max - center) / voltPerAmper;
+    const currentMin = (min - center) / voltPerAmpere;
+    const currentMax = (max - center) / voltPerAmpere;
 
     return { currentData, currentDataRaw, currentMin, currentMax };
   },
@@ -211,12 +212,18 @@ const simpleScope = {
         gui.updateVoltageChart(voltageData.voltageData);
         gui.setVoltageMin(voltageData.voltageMin.toFixed(2));
         gui.setVoltageMax(voltageData.voltageMax.toFixed(2));
-        gui.setVoltage((voltageData.voltageMax / Math.sqrt(2)).toFixed(2));
+        gui.setVoltage(
+          (((voltageData.voltageMax - voltageData.voltageMin) * 0.5) / Math.sqrt(2)).toFixed(2)
+        );
 
         const currentData = this._createCurrentData(this._lastVoltageSamples[1]);
 
         gui.updateCurrentChart(currentData.currentData);
-        console.log(currentData.currentMin, currentData.currentMax);
+        gui.setCurrentMin(currentData.currentMin.toFixed(3));
+        gui.setCurrentMax(currentData.currentMax.toFixed(3));
+        gui.setCurrent((currentData.currentMax / Math.sqrt(2)).toFixed(3));
+
+        console.log(calculatePower(voltageData.voltageDataRaw, currentData.currentDataRaw));
       }
     }, this._chartsUpdateInterval);
   },

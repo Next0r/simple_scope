@@ -79,6 +79,18 @@ const gui = {
      * @type {HTMLInputElement}
      */
     halfOffsetCheckbox: undefined,
+    /**
+     * @type {HTMLSpanElement}
+     */
+    currentSpan: undefined,
+    /**
+     * @type {HTMLSpanElement}
+     */
+    currentMinSpan: undefined,
+    /**
+     * @type {HTMLSpanElement}
+     */
+    currentMaxSpan: undefined,
   },
 
   /**
@@ -116,6 +128,9 @@ const gui = {
     this._elements.useFilterCheckbox = document.querySelector("#use-filter");
     this._elements.opAmpGainInput = document.querySelector("#op-amp-gain");
     this._elements.halfOffsetCheckbox = document.querySelector("#half-offset");
+    this._elements.currentSpan = document.querySelector("#current");
+    this._elements.currentMinSpan = document.querySelector("#current-min");
+    this._elements.currentMaxSpan = document.querySelector("#current-max");
   },
 
   _setEventListeners() {
@@ -296,6 +311,18 @@ const gui = {
 
   setVoltageMax(value = 0) {
     this._elements.voltageMaxSpan.innerText = value;
+  },
+
+  setCurrent(value = 0) {
+    this._elements.currentSpan.innerText = value;
+  },
+
+  setCurrentMin(value = 0) {
+    this._elements.currentMinSpan.innerText = value;
+  },
+
+  setCurrentMax(value = 0) {
+    this._elements.currentMaxSpan.innerText = value;
   },
 
   init() {
