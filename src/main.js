@@ -13,9 +13,10 @@ const simpleScope = {
   _chunkSize: 256,
   _serialDataProcessor: undefined,
   _lastSampleTime: 0,
-  _lastVoltageASamples: undefined,
+  _lastVoltageSamples: undefined,
   _chartsUpdateIntervalHandler: undefined,
   _chartsUpdateInterval: 1000,
+  _acs723VoltPerAmper: 0.4,
 
   _setConnectEvent() {
     gui.events.onConnectClick = () => {
@@ -162,15 +163,60 @@ const simpleScope = {
     return { voltageData, voltageDataRaw, voltageMin, voltageMax };
   },
 
+  _createCurrentData(voltageSamples = []) {
+    const timeStep = 1 / gui.getMCUSamplingSpeed(); // ms per sample
+    const voltPerAmper = this._acs723VoltPerAmper;
+
+    let samples = voltageSamples;
+    if (gui.getUseFilter()) {
+      samples = hampel(voltageSamples, { nSigmas: 3 });
+    }
+
+    const currentData = [];
+    const currentDataRaw = [];
+
+    let min = samples[0];
+    let max = samples[0];
+
+    samples.forEach((sample, index) => {
+      if (sample < min) {
+        min = sample;
+      } else if (sample > max) {
+        max = sample;
+      }
+    });
+
+    const center = (min + max) * 0.5;
+
+    samples.forEach((sample, index) => {
+      const realCurrentValue = (sample - center) / voltPerAmper;
+
+      currentDataRaw.push(realCurrentValue);
+      currentData.push({
+        value: [index * timeStep, realCurrentValue],
+      });
+    });
+
+    const currentMin = (min - center) / voltPerAmper;
+    const currentMax = (max - center) / voltPerAmper;
+
+    return { currentData, currentDataRaw, currentMin, currentMax };
+  },
+
   _setChartsUpdateInterval() {
     this._chartsUpdateIntervalHandler = setInterval(() => {
-      if (this._lastVoltageASamples) {
-        const voltageData = this._createVoltageData(this._lastVoltageASamples);
+      if (this._lastVoltageSamples) {
+        const voltageData = this._createVoltageData(this._lastVoltageSamples[0]);
 
         gui.updateVoltageChart(voltageData.voltageData);
         gui.setVoltageMin(voltageData.voltageMin.toFixed(2));
         gui.setVoltageMax(voltageData.voltageMax.toFixed(2));
         gui.setVoltage((voltageData.voltageMax / Math.sqrt(2)).toFixed(2));
+
+        const currentData = this._createCurrentData(this._lastVoltageSamples[1]);
+
+        gui.updateCurrentChart(currentData.currentData);
+        console.log(currentData.currentMin, currentData.currentMax);
       }
     }, this._chartsUpdateInterval);
   },
@@ -183,7 +229,7 @@ const simpleScope = {
       return;
     }
 
-    this._lastVoltageASamples = message.voltages[0];
+    this._lastVoltageSamples = message.voltages;
 
     // const voltageASample = message.voltages[0];
     // const voltageBSample = message.voltages[1];
