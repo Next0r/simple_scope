@@ -34,7 +34,7 @@ const serialDataProcessor = {
       if (index === null) {
         // skip till valid frame header found
         continue;
-      } else if (i + 1 > this._dataBuffer.length) {
+      } else if (i > this._dataBuffer.length - 3) {
         // frame start found yet it's not complete
         // remove all elements except incomplete frame
         this._dataBuffer = this._dataBuffer.slice(i);

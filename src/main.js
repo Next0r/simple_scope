@@ -110,7 +110,7 @@ const simpleScope = {
 
     let samples = voltageSamples;
     if (gui.getUseFilter()) {
-      samples = hampel(voltageSamples, { cutoff: true });
+      samples = hampel(voltageSamples, { nSigmas: 3 });
     }
 
     const voltageData = [];
