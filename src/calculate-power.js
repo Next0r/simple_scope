@@ -1,5 +1,5 @@
 /**
- * Calculates active power
+ * Calculates active power using simpsons rule approximation
  * @param {[]} voltageSamples set of instantaneous voltages
  * @param {[]} currentSamples set of instantaneous currents
  * @param {Number} timeStep time between two samples in seconds
@@ -7,16 +7,24 @@
  */
 const calculatePower = (voltageSamples = [], currentSamples = [], timeStep = 0.001) => {
   let power = 0;
-  const sampleSize = Math.min(voltageSamples.length, currentSamples.length);
 
-  for (let i = 1; i < sampleSize; i += 1) {
-    const a = voltageSamples[i - 1] * currentSamples[i - 1];
-    const b = voltageSamples[i] * currentSamples[i];
+  // sample size of voltage and current may not be equal
+  let sampleSize = Math.min(voltageSamples.length, currentSamples.length);
 
-    power += (a + b) * timeStep * 0.5;
+  if (sampleSize % 2 === 0) {
+    sampleSize -= 1;
   }
 
-  return (1 / (timeStep * (voltageSamples.length - 1))) * power;
+  for (let i = 0; i < sampleSize - 2; i += 2) {
+    const f0 = voltageSamples[i] * currentSamples[i];
+    const f1 = voltageSamples[i + 1] * currentSamples[i + 1];
+    const f2 = voltageSamples[i + 2] * currentSamples[i + 2];
+
+    power += f0 + 4 * f1 + f2;
+  }
+
+  power *= timeStep / 3;
+  return (1 / (timeStep * (sampleSize - 1))) * power;
 };
 
 module.exports = calculatePower;
