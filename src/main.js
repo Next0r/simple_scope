@@ -4,6 +4,7 @@ const multiThreading = require("./multi-threading");
 const SerialDataProcessorMessage = require("./serial-data-processor-message");
 const hampel = require("./hampel");
 const calculatePower = require("./calculate-power");
+const DataRecorder = require("./data-recorder");
 
 const simpleScope = {
   /**
@@ -261,6 +262,15 @@ const simpleScope = {
     this._setDisconnectEvent();
     this._setConnectEvent();
     this._setChartsUpdateInterval();
+
+    // const recorder = new DataRecorder({ name: "power", maxSize: 40 });
+
+    // let x = 0;
+
+    // setInterval(() => {
+    //   x += 1;
+    //   recorder.record(x);
+    // }, 500);
   },
 };
 
