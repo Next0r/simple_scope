@@ -19,7 +19,7 @@ class DataRecorder {
 
     if (this._records.length >= this._maxSize) {
       const date = new Date();
-      const p = path.join(
+      const filePath = path.join(
         __dirname,
         this._directory,
         `${this._name}_${date.getDate()}_${
@@ -28,9 +28,9 @@ class DataRecorder {
       );
 
       fse
-        .outputJSON(p, this._records, { flag: "w+" })
+        .outputJSON(filePath, this._records, { flag: "w+" })
         .then(() => {
-          console.log(`Saved file ${p} with ${this._records.length} records.`);
+          console.log(`Saved file ${filePath} with ${this._records.length} records.`);
           this._records = [];
         })
         .catch((err) => {
