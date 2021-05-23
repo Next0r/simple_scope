@@ -2,105 +2,61 @@ const echarts = require("echarts");
 
 const gui = {
   _elements: {
-    /**
-     * @type {HTMLSelectElement}
-     */
+    /** @type {HTMLSelectElement} */
     portSelectElement: undefined,
-    /**
-     * @type {HTMLButtonElement}
-     */
+    /** @type {HTMLAnchorElement} */
     connectButton: undefined,
-    /**
-     * @type {HTMLButtonElement}
-     */
+    /** @type {HTMLAnchorElement} */
     disconnectButton: undefined,
-    /**
-     * @type {HTMLInputElement}
-     */
+    /** @type {HTMLInputElement} */
     baudRateInput: undefined,
-    /**
-     * @type {HTMLButtonElement}
-     */
+    /** @type {HTMLAnchorElement} */
     scanPortsButton: undefined,
-    /**
-     * @type {HTMLSpanElement}
-     */
+    /** @type {HTMLSpanElement} */
     voltageSpan: undefined,
-    /**
-     * @type {HTMLDivElement}
-     */
+    /** @type {HTMLDivElement} */
     voltageChartDiv: undefined,
-
-    /**
-     * @type {HTMLSpanElement}
-     */
+    /** @type {HTMLSpanElement} */
     samplesPerSecSpan: undefined,
-    /**
-     * @type {HTMLSpanElement}
-     */
+    /** @type {HTMLSpanElement} */
     voltageMinSpan: undefined,
-    /**
-     * @type {HTMLSpanElement}
-     */
+    /** @type {HTMLSpanElement} */
     voltageMaxSpan: undefined,
-    /**
-     * @type {HTMLInputElement}
-     */
+    /** @type {HTMLInputElement} */
     referenceVoltageInput: undefined,
-    /**
-     * @type {HTMLDivElement}
-     */
+    /** @type {HTMLDivElement} */
     currentChartDiv: undefined,
-    /**
-     * @type {HTMLInputElement}
-     */
+    /** @type {HTMLInputElement} */
     offsetVoltageInput: undefined,
-    /**
-     * @type {HTMLInputElement}
-     */
+    /** @type {HTMLInputElement} */
     acVoltageReference: undefined,
-    /**
-     * @type {HTMLInputElement}
-     */
+    /** @type {HTMLInputElement} */
     useGainCheckbox: undefined,
-    /**
-     * @type {HTMLInputElement}
-     */
+    /** @type {HTMLInputElement} */
     mcuSamplingSpeed: undefined,
-    /**
-     * @type {HTMLInputElement}
-     */
+    /** @type {HTMLInputElement} */
     useFilterCheckbox: undefined,
-    /**
-     * @type {HTMLInputElement}
-     */
+    /** @type {HTMLInputElement} */
     opAmpGainInput: undefined,
-    /**
-     * @type {HTMLInputElement}
-     */
+    /** @type {HTMLInputElement} */
     halfOffsetCheckbox: undefined,
-    /**
-     * @type {HTMLSpanElement}
-     */
+    /** @type {HTMLSpanElement} */
     currentSpan: undefined,
-    /**
-     * @type {HTMLSpanElement}
-     */
+    /** @type {HTMLSpanElement} */
     currentMinSpan: undefined,
-    /**
-     * @type {HTMLSpanElement}
-     */
+    /** @type {HTMLSpanElement} */
     currentMaxSpan: undefined,
+    /** @type {HTMLParagraphElement} */
+    fileSavedCalloutParagraph: undefined,
+    /** @type {HTMLButtonElement} */
+    fileSavedCalloutButton: undefined,
   },
 
-  /**
-   * @type {echarts.ECharts}
-   */
+  /** @type {echarts.ECharts} */
   _voltageChart: undefined,
-  /**
-   * @type {echarts.ECharts}
-   */
+  /** @type {echarts.ECharts} */
   _currentChart: undefined,
+  _closeFileSavedCalloutTimeoutHandler: undefined,
 
   events: {
     onConnectClick: () => {},
@@ -131,6 +87,10 @@ const gui = {
     this._elements.currentSpan = document.querySelector("#current");
     this._elements.currentMinSpan = document.querySelector("#current-min");
     this._elements.currentMaxSpan = document.querySelector("#current-max");
+    this._elements.fileSavedCalloutParagraph = document.querySelector(
+      "#file-saved-callout-paragraph"
+    );
+    this._elements.fileSavedCalloutButton = document.querySelector("#file-saved-callout-button");
   },
 
   _setEventListeners() {
@@ -354,6 +314,21 @@ const gui = {
 
   setCurrentMax(value = 0) {
     this._elements.currentMaxSpan.innerText = value;
+  },
+
+  setAndViewFileSavedCallout(value = "", { closeTimeout = null } = {}) {
+    this._elements.fileSavedCalloutParagraph.innerText = value;
+    this._elements.fileSavedCalloutParagraph.parentNode.style.removeProperty("display");
+
+    if (closeTimeout !== null) {
+      if (this._closeFileSavedCalloutTimeoutHandler) {
+        clearTimeout(this._closeFileSavedCalloutTimeoutHandler);
+      }
+
+      this._closeFileSavedCalloutTimeoutHandler = setTimeout(() => {
+        this._elements.fileSavedCalloutButton.click();
+      }, closeTimeout);
+    }
   },
 
   init() {

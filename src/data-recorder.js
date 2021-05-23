@@ -1,5 +1,6 @@
 const path = require("path");
 const fse = require("fs-extra");
+const gui = require("./gui");
 
 class DataRecorder {
   constructor({ name = "recorder", directory = "records", maxSize = 1000 } = {}) {
@@ -30,7 +31,10 @@ class DataRecorder {
       fse
         .outputJSON(filePath, this._records, { flag: "w+" })
         .then(() => {
-          console.log(`Saved file ${filePath} with ${this._records.length} records.`);
+          gui.setAndViewFileSavedCallout(
+            `Saved file ${filePath} with ${this._records.length} records.`,
+            { closeTimeout: 5000 }
+          );
           this._records = [];
         })
         .catch((err) => {
