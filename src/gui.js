@@ -201,12 +201,20 @@ const gui = {
     });
   },
 
-  _createChartOption() {
+  _createChartOption({ title = "chart", xAxisName = "x", yAxisName = "y" } = {}) {
     return {
+      title: {
+        text: title,
+        left: "center",
+      },
       xAxis: {
+        name: xAxisName,
+        nameLocation: "middle",
         type: "value",
       },
       yAxis: {
+        name: yAxisName,
+        nameLocation: "middle",
         type: "value",
       },
       series: [
@@ -223,8 +231,20 @@ const gui = {
     this._voltageChart = echarts.init(this._elements.voltageChartDiv);
     this._currentChart = echarts.init(this._elements.currentChartDiv);
 
-    this._voltageChart.setOption(this._createChartOption());
-    this._currentChart.setOption(this._createChartOption());
+    this._voltageChart.setOption(
+      this._createChartOption({
+        title: "Measured voltage",
+        xAxisName: "Time, ms",
+        yAxisName: "Voltage, V",
+      })
+    );
+    this._currentChart.setOption(
+      this._createChartOption({
+        title: "Measured current",
+        xAxisName: "Time, ms",
+        yAxisName: "Current, A",
+      })
+    );
   },
 
   fakeDisconnectClick() {
