@@ -134,7 +134,10 @@ const gui = {
   },
 
   _setEventListeners() {
-    this._elements.connectButton.addEventListener("click", async () => {
+    this._elements.connectButton.addEventListener("click", async (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
       const success = await this.events.onConnectClick();
       if (success) {
         this._elements.disconnectButton.disabled = false;
@@ -143,7 +146,10 @@ const gui = {
       }
     });
 
-    this._elements.disconnectButton.addEventListener("click", async () => {
+    this._elements.disconnectButton.addEventListener("click", async (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
       const success = await this.events.onDisconnectClick();
       if (success) {
         this._elements.disconnectButton.disabled = true;
@@ -152,7 +158,10 @@ const gui = {
       }
     });
 
-    this._elements.scanPortsButton.addEventListener("click", async () => {
+    this._elements.scanPortsButton.addEventListener("click", async (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
       const ports = await this.events.onScanPortsClick();
 
       if (!ports || ports.length === 0) {
@@ -182,11 +191,13 @@ const gui = {
         this._elements.offsetVoltageInput.disabled = false;
         this._elements.opAmpGainInput.disabled = false;
         this._elements.halfOffsetCheckbox.disabled = false;
+        this._elements.halfOffsetCheckbox.checked = false;
       } else {
         this._elements.acVoltageReference.disabled = false;
         this._elements.offsetVoltageInput.disabled = true;
         this._elements.opAmpGainInput.disabled = true;
         this._elements.halfOffsetCheckbox.disabled = true;
+        this._elements.halfOffsetCheckbox.checked = false;
       }
     });
 

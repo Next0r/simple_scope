@@ -1,4 +1,5 @@
 const { app, BrowserWindow } = require("electron");
+require("electron-reload")(__dirname);
 
 const path = require("path");
 
@@ -15,6 +16,7 @@ function createWindow() {
 
   win.loadFile(path.join(__dirname, "index.html"));
   win.webContents.openDevTools();
+  win.removeMenu();
 }
 
 app.allowRendererProcessReuse = false;

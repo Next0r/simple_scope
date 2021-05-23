@@ -3,85 +3,100 @@
   <head>
     <meta charset="UTF-8" />
     <title>Simple Scope</title>
-    <meta
+    <!-- <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; style-src 'unsafe-inline'"
-    />
+      content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src data:image/svg+xml;"
+    /> -->
+    <meta charset="utf-8" />
+    <link type="text/css" rel="stylesheet" href="assets/css/foundation.css" />
+    <link type="text/css" rel="stylesheet" href="css/style.css" />
   </head>
   <body style="background-color: white">
-    <div>
-      <button id="scan-ports-button">Scan ports</button>
+    <div class="grid-container">
+      <div class="grid-x grid-padding-x">
+        <div class="large-6 cell">
+          <fieldset class="fieldset">
+            <legend>Connection</legend>
+
+            <a id="scan-ports-button" href="#" class="button">Scan ports</a>
+
+            <label>Select port:</label>
+            <select id="select-port-list">
+              <option>None</option>
+            </select>
+
+            <label>Baud rate:</label>
+            <input id="baud-rate" type="text" value="115900" disabled />
+
+            <a id="connect-button" href="#" class="button" disabled>Connect</a>
+            <a id="disconnect-button" href="#" class="button" disabled>Disconnect</a>
+          </fieldset>
+
+          <fieldset class="fieldset">
+            <legend>Data</legend>
+            <div><span>Samples per second: </span><span id="samples-per-second">-</span></div>
+            <div><span>Voltage: </span><span id="voltage">-</span></div>
+            <div><span>Voltage min: </span><span id="voltage-min">-</span></div>
+            <div><span>Voltage max: </span><span id="voltage-max">-</span></div>
+
+            <div><span>Current:</span><span id="current">-</span></div>
+            <div><span>Current min:</span><span id="current-min">-</span></div>
+            <div><span>Current max:</span><span id="current-max">-</span></div>
+          </fieldset>
+        </div>
+
+        <div class="large-6 cell">
+          <fieldset class="fieldset">
+            <legend>Options</legend>
+
+            <label>MCU sampling speed:</label>
+            <input id="mcu-sampling-speed" type="text" value="1000" />
+
+            <label>ADC reference voltage: </label>
+            <input id="reference-voltage" type="text" value="5.00" />
+
+            <hr />
+
+            <label>Mains AC voltage reference:</label>
+            <input id="ac-voltage-reference" type="text" value="230" />
+
+            <input id="use-gain" type="checkbox" />
+            <label> Use op-amp gain instead AC reference</label>
+
+            <label>Op-amp gain:</label>
+            <input id="op-amp-gain" type="text" value="0.004994506043" disabled />
+
+            <label>Summing amplifier offset voltage:</label>
+            <input id="offset-voltage" type="text" value="2.50" disabled />
+
+            <input id="half-offset" type="checkbox" disabled />
+            <label>Use offset of half ADC reference</label>
+
+            <hr />
+
+            <input id="use-filter" type="checkbox" />
+            <label>Filter outliers</label>
+          </fieldset>
+        </div>
+      </div>
+
+      <div class="grid-x grid-padding-x">
+        <div class="large-12 cell">
+          <fieldset class="fieldset">
+            <legend>Charts</legend>
+            <div id="voltage-chart" class="float-left" style="width: 50%; height: 400px"></div>
+            <div id="current-chart" class="float-right" style="width: 50%; height: 400px"></div>
+          </fieldset>
+        </div>
+
+        <div class="large-6 cell"></div>
+        <div class="large-6 cell"></div>
+      </div>
     </div>
 
-    <div>
-      <span>Select port:</span>
-      <select id="select-port-list">
-        <option>---</option>
-      </select>
-    </div>
-
-    <div><span>Baud rate:</span><input id="baud-rate" type="text" value="115900" disabled /></div>
-
-    <div>
-      <button id="connect-button" disabled>Connect</button>
-    </div>
-
-    <div>
-      <button id="disconnect-button" disabled>Disconnect</button>
-    </div>
-
-    <div>
-      <span>MCU sampling speed:</span>
-      <input id="mcu-sampling-speed" type="text" value="1000" />
-    </div>
-
-    <div>
-      <span>ADC Reference voltage: </span>
-      <input id="reference-voltage" type="text" value="5.00" />
-    </div>
-
-    <div>
-      <span>Mains AC voltage reference:</span>
-      <input id="ac-voltage-reference" type="text" value="230" />
-    </div>
-
-    <div>
-      <span>Use op-amp gain instead AC reference:</span>
-      <input id="use-gain" type="checkbox" />
-    </div>
-
-    <div>
-      <span>Op-amp gain:</span>
-      <input id="op-amp-gain" type="text" value="0.004994506043" disabled />
-    </div>
-
-    <div>
-      <span>Half offset (0.5 * ADC Reference):</span>
-      <input id="half-offset" type="checkbox" disabled />
-    </div>
-
-    <div>
-      <span>Summing amplifier offset voltage:</span>
-      <input id="offset-voltage" type="text" value="2.50" disabled />
-    </div>
-
-    <div>
-      <span>Filter outliers:</span>
-      <input id="use-filter" type="checkbox" />
-    </div>
-
-    <div><span>Samples per second: </span><span id="samples-per-second">-</span></div>
-    <div><span>Voltage: </span><span id="voltage">-</span></div>
-    <div><span>Voltage min: </span><span id="voltage-min">-</span></div>
-    <div><span>Voltage max: </span><span id="voltage-max">-</span></div>
-
-    <div><span>Current:</span><span id="current">-</span></div>
-    <div><span>Current min:</span><span id="current-min">-</span></div>
-    <div><span>Current max:</span><span id="current-max">-</span></div>
-
-    <div id="voltage-chart" style="width: 600px; height: 400px"></div>
-    <div id="current-chart" style="width: 600px; height: 400px"></div>
-
+    <script src="assets/js/jquery-3.6.0.slim.min.js"></script>
+    <script src="assets/js/vendor.js"></script>
+    <script src="assets/js/foundation.js"></script>
     <script src="main.js"></script>
   </body>
 </html>
