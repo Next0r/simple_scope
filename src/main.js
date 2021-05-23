@@ -229,6 +229,16 @@ const simpleScope = {
     }, this._chartsUpdateInterval);
   },
 
+  _calculateRealSamplingSpeed() {
+    if (!this._lastSampleTime) {
+      return;
+    }
+
+    return (
+      (this._lastVoltageSamples[0].length / (new Date().getTime() - this._lastSampleTime)) * 1000
+    );
+  },
+
   /**
    * @param {SerialDataProcessorMessage} message
    */
@@ -239,13 +249,9 @@ const simpleScope = {
 
     this._lastVoltageSamples = message.voltages;
 
-    // const voltageASample = message.voltages[0];
-    // const voltageBSample = message.voltages[1];
+    gui.setSamplesPerSec(this._calculateRealSamplingSpeed());
 
     this._lastSampleTime = new Date().getTime();
-
-    // gui.setVoltage(voltageASample[0]);
-    // gui.setVoltageMax(voltageBSample[0]);
   },
 
   _startSerialDataProcessor() {
