@@ -237,10 +237,12 @@ const gui = {
     );
   },
 
-  _setupNotificationHandler() {
+  _setupWindowResizeEvents() {
     this._elements.fileSavedNotification.style.width = `${this._elements.mainContainer.clientWidth}px`;
     window.addEventListener("resize", () => {
       this._elements.fileSavedNotification.style.width = `${this._elements.mainContainer.clientWidth}px`;
+      this._voltageChart.resize();
+      this._currentChart.resize();
     });
   },
 
@@ -373,7 +375,7 @@ const gui = {
     this._setHTMLElementsReferences();
     this._setEventListeners();
     this._initializeCharts();
-    this._setupNotificationHandler();
+    this._setupWindowResizeEvents();
   },
 };
 
