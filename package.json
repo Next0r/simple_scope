@@ -1,4 +1,5 @@
 {
+  "productName":"SimpleScope",
   "name": "simple_scope",
   "version": "1.0.0",
   "description": "",
@@ -6,7 +7,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron ./src/index.js",
-    "rebuild": "electron-rebuild -f -w serialport"
+    "rebuild": "electron-rebuild -f -w serialport",
+    "build":"electron-packager . --out './build/'"
   },
   "repository": {
     "type": "git",
@@ -20,6 +22,7 @@
   "homepage": "https://github.com/Next0r/simple_scope#readme",
   "devDependencies": {
     "electron": "^12.0.7",
+    "electron-packager": "^15.2.0",
     "electron-rebuild": "^2.3.5"
   },
   "dependencies": {
