@@ -11,36 +11,36 @@ class DataRecorder {
   }
 
   record(value = "value") {
-    this._records.push({
-      timestamp: new Date().toISOString(),
-      value: value,
-    });
+    return new Promise((resolve, reject) => {
+      // store data
+      this._records.push({
+        timestamp: new Date().toISOString(),
+        value: value,
+      });
 
-    fse;
+      // save file if max data size limit met
+      if (this._records.length >= this._maxSize) {
+        const date = new Date();
 
-    if (this._records.length >= this._maxSize) {
-      const date = new Date();
-      const filePath = path.join(
-        __dirname,
-        this._directory,
-        `${this._name}_${date.getDate()}_${
-          date.getMonth() + 1
-        }_${date.getFullYear()}_${date.getHours()}_${date.getMinutes()}_${date.getSeconds()}.json`
-      );
+        // create file path and name with current date and time
+        const filePath = path.join(
+          __dirname,
+          this._directory,
+          `${this._name}_${date.getDate()}_${
+            date.getMonth() + 1
+          }_${date.getFullYear()}_${date.getHours()}_${date.getMinutes()}_${date.getSeconds()}.json`
+        );
 
-      fse
-        .outputJSON(filePath, this._records, { flag: "w+" })
-        .then(() => {
-          gui.setAndViewFileSavedNotification(
-            `Saved file ${filePath} with ${this._records.length} records.`,
-            { closeTimeout: 5000 }
-          );
+        // save as json
+        fse.outputJSON(filePath, this._records, { flag: "w+" }, (err) => {
+          if (err) {
+            reject(err);
+          }
+          resolve(`Saved file ${filePath} with ${this._records.length} records.`);
           this._records = [];
-        })
-        .catch((err) => {
-          console.log(err);
         });
-    }
+      }
+    });
   }
 }
 

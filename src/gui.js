@@ -51,6 +51,12 @@ const gui = {
     fileSavedNotificationParagraph: undefined,
     /** @type {HTMLButtonElement} */
     fileSavedNotificationButton: undefined,
+    /** @type {HTMLSpanElement} */
+    powerSpan: undefined,
+    /** @type {HTMLDivElement} */
+    mainContainer: undefined,
+    /** @type {HTMLDivElement} */
+    fileSavedNotification: undefined,
   },
 
   /** @type {echarts.ECharts} */
@@ -94,6 +100,9 @@ const gui = {
     this._elements.fileSavedNotificationButton = document.querySelector(
       "#file-saved-notification-button"
     );
+    this._elements.powerSpan = document.querySelector("#power");
+    this._elements.mainContainer = document.querySelector("#main-container");
+    this._elements.fileSavedNotification = document.querySelector("#file-saved-notification");
   },
 
   _setEventListeners() {
@@ -228,6 +237,13 @@ const gui = {
     );
   },
 
+  _setupNotificationHandler() {
+    this._elements.fileSavedNotification.style.width = `${this._elements.mainContainer.clientWidth}px`;
+    window.addEventListener("resize", () => {
+      this._elements.fileSavedNotification.style.width = `${this._elements.mainContainer.clientWidth}px`;
+    });
+  },
+
   fakeDisconnectClick() {
     this._elements.disconnectButton.disabled = true;
     this._elements.connectButton.disabled = false;
@@ -326,9 +342,13 @@ const gui = {
     this._elements.currentMaxSpan.innerText = value;
   },
 
+  setPower(value = 0) {
+    this._elements.powerSpan.innerText = value;
+  },
+
   setAndViewFileSavedNotification(value = "", { closeTimeout = null } = {}) {
     this._elements.fileSavedNotificationParagraph.innerText = value;
-    $(this._elements.fileSavedNotificationParagraph.parentNode).slideDown(500);
+    $(this._elements.fileSavedNotification).slideDown(500);
 
     if (closeTimeout !== null) {
       if (this._closeFileSavedNotificationTimeoutHandler) {
@@ -342,13 +362,18 @@ const gui = {
   },
 
   closeFileSavedNotification() {
-    $(this._elements.fileSavedNotificationParagraph.parentNode).slideUp(500);
+    if (this._closeFileSavedNotificationTimeoutHandler) {
+      clearTimeout(this._closeFileSavedNotificationTimeoutHandler);
+    }
+
+    $(this._elements.fileSavedNotification).slideUp(500);
   },
 
   init() {
     this._setHTMLElementsReferences();
     this._setEventListeners();
     this._initializeCharts();
+    this._setupNotificationHandler();
   },
 };
 

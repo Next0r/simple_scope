@@ -16,9 +16,14 @@ const simpleScope = {
   _serialDataProcessor: undefined,
   _lastSampleTime: 0,
   _lastVoltageSamples: undefined,
-  _chartsUpdateIntervalHandler: undefined,
-  _chartsUpdateInterval: 1000,
+  _measurementIntervalHandler: undefined,
+  _measurementsUpdateInterval: 1000,
   _acs723VoltPerAmpere: 0.4,
+  _powerRecorder: new DataRecorder({
+    name: "power_record",
+    directory: "power_records",
+    maxSize: 3600,
+  }),
 
   _setConnectEvent() {
     gui.events.onConnectClick = () => {
@@ -205,8 +210,8 @@ const simpleScope = {
     return { currentData, currentDataRaw, currentMin, currentMax };
   },
 
-  _setChartsUpdateInterval() {
-    this._chartsUpdateIntervalHandler = setInterval(() => {
+  _setMeasurementUpdateInterval() {
+    this._measurementIntervalHandler = setInterval(() => {
       if (this._lastVoltageSamples) {
         const voltageData = this._createVoltageData(this._lastVoltageSamples[0]);
 
@@ -224,9 +229,18 @@ const simpleScope = {
         gui.setCurrentMax(currentData.currentMax.toFixed(3));
         gui.setCurrent((currentData.currentMax / Math.sqrt(2)).toFixed(3));
 
-        console.log(calculatePower(voltageData.voltageDataRaw, currentData.currentDataRaw));
+        const power = calculatePower(voltageData.voltageDataRaw, currentData.currentDataRaw);
+        gui.setPower(power);
+        this._powerRecorder
+          .record(power)
+          .then((message) => {
+            gui.setAndViewFileSavedNotification(message, { closeTimeout: 4000 });
+          })
+          .catch((err) => {
+            console.warn(err);
+          });
       }
-    }, this._chartsUpdateInterval);
+    }, this._measurementsUpdateInterval);
   },
 
   _calculateRealSamplingSpeed() {
@@ -249,7 +263,7 @@ const simpleScope = {
 
     this._lastVoltageSamples = message.voltages;
 
-    gui.setSamplesPerSec(this._calculateRealSamplingSpeed());
+    // gui.setSamplesPerSec(this._calculateRealSamplingSpeed());
 
     this._lastSampleTime = new Date().getTime();
   },
@@ -267,7 +281,7 @@ const simpleScope = {
     this._setScanPortsEvent();
     this._setDisconnectEvent();
     this._setConnectEvent();
-    this._setChartsUpdateInterval();
+    this._setMeasurementUpdateInterval();
 
     // const recorder = new DataRecorder({ name: "power", maxSize: 40 });
 
@@ -275,7 +289,14 @@ const simpleScope = {
 
     // setInterval(() => {
     //   x += 1;
-    //   recorder.record(x);
+    //   recorder
+    //     .record(x)
+    //     .then((msg) => {
+    //       gui.setAndViewFileSavedNotification(msg, { closeTimeout: 4000 });
+    //     })
+    //     .catch((err) => {
+    //       console.log(err);
+    //     });
     // }, 500);
   },
 };
