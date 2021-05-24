@@ -1,6 +1,5 @@
 const path = require("path");
 const fse = require("fs-extra");
-const gui = require("./gui");
 
 class DataRecorder {
   constructor({ name = "recorder", directory = "records", maxSize = 1000 } = {}) {
