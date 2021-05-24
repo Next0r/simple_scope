@@ -1,4 +1,5 @@
 const echarts = require("echarts");
+const $ = require("jquery");
 
 const gui = {
   _elements: {
@@ -47,16 +48,16 @@ const gui = {
     /** @type {HTMLSpanElement} */
     currentMaxSpan: undefined,
     /** @type {HTMLParagraphElement} */
-    fileSavedCalloutParagraph: undefined,
+    fileSavedNotificationParagraph: undefined,
     /** @type {HTMLButtonElement} */
-    fileSavedCalloutButton: undefined,
+    fileSavedNotificationButton: undefined,
   },
 
   /** @type {echarts.ECharts} */
   _voltageChart: undefined,
   /** @type {echarts.ECharts} */
   _currentChart: undefined,
-  _closeFileSavedCalloutTimeoutHandler: undefined,
+  _closeFileSavedNotificationTimeoutHandler: undefined,
 
   events: {
     onConnectClick: () => {},
@@ -87,10 +88,12 @@ const gui = {
     this._elements.currentSpan = document.querySelector("#current");
     this._elements.currentMinSpan = document.querySelector("#current-min");
     this._elements.currentMaxSpan = document.querySelector("#current-max");
-    this._elements.fileSavedCalloutParagraph = document.querySelector(
-      "#file-saved-callout-paragraph"
+    this._elements.fileSavedNotificationParagraph = document.querySelector(
+      "#file-saved-notification-paragraph"
     );
-    this._elements.fileSavedCalloutButton = document.querySelector("#file-saved-callout-button");
+    this._elements.fileSavedNotificationButton = document.querySelector(
+      "#file-saved-notification-button"
+    );
   },
 
   _setEventListeners() {
@@ -169,6 +172,13 @@ const gui = {
       } else {
         this._elements.offsetVoltageInput.disabled = false;
       }
+    });
+
+    this._elements.fileSavedNotificationButton.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      this.closeFileSavedNotification();
     });
   },
 
@@ -316,19 +326,23 @@ const gui = {
     this._elements.currentMaxSpan.innerText = value;
   },
 
-  setAndViewFileSavedCallout(value = "", { closeTimeout = null } = {}) {
-    this._elements.fileSavedCalloutParagraph.innerText = value;
-    this._elements.fileSavedCalloutParagraph.parentNode.style.removeProperty("display");
+  setAndViewFileSavedNotification(value = "", { closeTimeout = null } = {}) {
+    this._elements.fileSavedNotificationParagraph.innerText = value;
+    $(this._elements.fileSavedNotificationParagraph.parentNode).slideDown(500);
 
     if (closeTimeout !== null) {
-      if (this._closeFileSavedCalloutTimeoutHandler) {
-        clearTimeout(this._closeFileSavedCalloutTimeoutHandler);
+      if (this._closeFileSavedNotificationTimeoutHandler) {
+        clearTimeout(this._closeFileSavedNotificationTimeoutHandler);
       }
 
-      this._closeFileSavedCalloutTimeoutHandler = setTimeout(() => {
-        this._elements.fileSavedCalloutButton.click();
+      this._closeFileSavedNotificationTimeoutHandler = setTimeout(() => {
+        this.closeFileSavedNotification();
       }, closeTimeout);
     }
+  },
+
+  closeFileSavedNotification() {
+    $(this._elements.fileSavedNotificationParagraph.parentNode).slideUp(500);
   },
 
   init() {

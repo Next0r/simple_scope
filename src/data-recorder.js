@@ -31,7 +31,7 @@ class DataRecorder {
       fse
         .outputJSON(filePath, this._records, { flag: "w+" })
         .then(() => {
-          gui.setAndViewFileSavedCallout(
+          gui.setAndViewFileSavedNotification(
             `Saved file ${filePath} with ${this._records.length} records.`,
             { closeTimeout: 5000 }
           );
