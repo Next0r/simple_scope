@@ -136,11 +136,14 @@ const gui = {
 
       const ports = await this.events.onScanPortsClick();
 
+      this._elements.portSelectElement.innerHTML = "";
+
       if (!ports || ports.length === 0) {
+        const optionElement = document.createElement("option");
+        optionElement.innerText = "None";
+        this._elements.portSelectElement.appendChild(optionElement);
         return;
       }
-
-      this._elements.portSelectElement.innerHTML = "";
 
       for (let port of ports) {
         const optionElement = document.createElement("option");
