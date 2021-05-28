@@ -14,205 +14,205 @@
 
 <body style="background-color: white">
 
-    <div id="main-container" class="container" style="margin-top: 1em; margin-bottom: 1em;">
+  <div id="main-container" class="container" style="margin-top: 1em; margin-bottom: 1em;">
 
-      <div id="file-saved-notification" class="notification is-primary is-light"
-        style="position: fixed; top: 1em; z-index: 100;" hidden>
-        <a id="file-saved-notification-button" href="#" class="delete"></a>
-        <p id="file-saved-notification-paragraph"></p>
-      </div>
+    <div id="file-saved-notification" class="notification is-primary is-light"
+      style="position: fixed; top: 1em; z-index: 100;" hidden>
+      <a id="file-saved-notification-button" href="#" class="delete"></a>
+      <p id="file-saved-notification-paragraph"></p>
+    </div>
 
-      <div class="tile is-ancestor">
+    <div class="tile is-ancestor">
 
-        <div class="tile is-vertical is-6 is-parent">
-          <div class="tile is-child box">
+      <div class="tile is-vertical is-6 is-parent">
+        <div class="tile is-child box">
 
-            <div class="block">
-              <a id="scan-ports-button" href="#" class="button is-danger is-fullwidth">Scan ports</a>
-            </div>
-
-
-            <div class="field">
-              <label class="label">Select port</label>
-              <div class="control">
-                <div class="select">
-                  <select id="select-port-list">
-                    <option>None</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div class="field">
-              <label class="label">Baudrate</label>
-              <div class="control">
-                <input id="baud-rate" class="input" type="text" value="115900" disabled />
-              </div>
-            </div>
-
-            <a id="connect-button" href="#" class="button is-primary">Connect</a>
-            <a id="disconnect-button" href="#" class="button is-primary" disabled>Disconnect</a>
-
+          <div class="block">
+            <a id="scan-ports-button" href="#" class="button is-danger is-fullwidth">Scan ports</a>
           </div>
-        </div>
 
-        <div class="tile  is-6 is-parent">
-          <div class="tile is-child box">
 
-            <div class="field">
-              <label class="label">MCU sampling speed</label>
-              <div class="control">
-                <input id="mcu-sampling-speed" class="input" type="text" value="1000">
+          <div class="field">
+            <label class="label">Select port</label>
+            <div class="control">
+              <div class="select">
+                <select id="select-port-list">
+                  <option>None</option>
+                </select>
               </div>
-            </div>
-
-            <div class="field">
-              <label class="label">ADC reference voltage</label>
-              <div class="control">
-                <input id="reference-voltage" type="text" class="input" value="5.00">
-              </div>
-            </div>
-
-            <div class="field">
-              <label class="label">Mains AC voltage reference</label>
-              <div class="control">
-                <input id="ac-voltage-reference" type="text" class="input" value="230">
-              </div>
-            </div>
-
-            <div class="field">
-              <div class="control">
-                <label class="checkbox">
-                  <input id="use-gain" type="checkbox">
-                  Use op-amp gain
-                </label>
-              </div>
-            </div>
-
-            <div class="field">
-              <label class="label">Op-amp gain</label>
-              <div class="control">
-                <input id="op-amp-gain" class="input" type="text" value="0.004994506043" disabled />
-              </div>
-            </div>
-
-            <div class="field">
-              <label class="label">Summing amplifier offset voltage</label>
-              <div class="control">
-                <input id="offset-voltage" class="input" type="text" value="2.50" disabled />
-              </div>
-            </div>
-
-            <div class="field">
-              <div class="control">
-                <label class="checkbox">
-                  <input id="half-offset" type="checkbox" disabled>
-                  Use offset of half ADC reference
-                </label>
-              </div>
-            </div>
-
-            <div class="field">
-              <div class="control">
-                <label class="checkbox">
-                  <input id="use-filter" type="checkbox">
-                  Filter outliers
-                </label>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-
-      <div class="tile is-ancestor">
-
-        <div class="tile is-parent is-vertical is-5">
-          <div class="tile is-child box">
-            <div class="level">
-
-              <div class="level-item has-text-centered">
-                <div>
-                  <p class="heading">Voltage min</p>
-                  <p class="subtitle"><span id="voltage-min">-</span></p>
-                </div>
-              </div>
-
-              <div class="level-item has-text-centered">
-                <div>
-                  <p class="heading">Voltage</p>
-                  <p class="title"><span id="voltage">-</span></p>
-                </div>
-              </div>
-
-              <div class="level-item has-text-centered">
-                <div>
-                  <p class="heading">Voltage max</p>
-                  <p class="subtitle"><span id="voltage-max">-</span></p>
-                </div>
-              </div>
-
             </div>
           </div>
-        </div>
 
-        <div class="tile is-vertical is-parent is-2">
-          <div class="tile is-child box">
-            <div class="has-text-centered">
-              <p class="heading">Power</p>
-              <p class="title"><span id="power">-</span></p>
+          <div class="field">
+            <label class="label">Baudrate</label>
+            <div class="control">
+              <input id="baud-rate" class="input" type="text" value="115900" />
             </div>
           </div>
-        </div>
 
-        <div class="tile is-vertical is-parent is-5">
-          <div class="tile is-child box">
-            <div class="level">
+          <a id="connect-button" href="#" class="button is-primary">Connect</a>
+          <a id="disconnect-button" href="#" class="button is-primary" disabled>Disconnect</a>
 
-              <div class="level-item has-text-centered">
-                <div>
-                  <p class="heading">Current min</p>
-                  <p class="subtitle"><span id="current-min">-</span></p>
-                </div>
-              </div>
-
-              <div class="level-item has-text-centered">
-                <div>
-                  <p class="heading">Current</p>
-                  <p class="title"><span id="current">-</span></p>
-                </div>
-              </div>
-
-              <div class="level-item has-text-centered">
-                <div>
-                  <p class="heading">Current max</p>
-                  <p class="subtitle"><span id="current-max">-</span></p>
-                </div>
-              </div>
-
-            </div>
-          </div>
         </div>
       </div>
 
-      <div class="tile is-ancestor">
+      <div class="tile  is-6 is-parent">
+        <div class="tile is-child box">
 
-        <div class="tile is-vertical is-parent is-6">
-          <div class="tile is-child box">
-            <div id="voltage-chart" style="width: 100%; height: 400px"></div>
+          <div class="field">
+            <label class="label">MCU sampling speed</label>
+            <div class="control">
+              <input id="mcu-sampling-speed" class="input" type="text" value="1000">
+            </div>
           </div>
-        </div>
 
-        <div class="tile is-vertical is-parent is-6">
-          <div class="tile is-child box">
-            <div id="current-chart" style="width: 100%; height: 400px"></div>
+          <div class="field">
+            <label class="label">ADC reference voltage</label>
+            <div class="control">
+              <input id="reference-voltage" type="text" class="input" value="4.97">
+            </div>
           </div>
-        </div>
 
+          <div class="field">
+            <label class="label">Mains AC voltage reference</label>
+            <div class="control">
+              <input id="ac-voltage-reference" type="text" class="input" value="230">
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="control">
+              <label class="checkbox">
+                <input id="use-gain" type="checkbox">
+                Use op-amp gain
+              </label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">Op-amp gain</label>
+            <div class="control">
+              <input id="op-amp-gain" class="input" type="text" value="0.004997501249" disabled />
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">Summing amplifier offset voltage</label>
+            <div class="control">
+              <input id="offset-voltage" class="input" type="text" value="2.45" disabled />
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="control">
+              <label class="checkbox">
+                <input id="half-offset" type="checkbox" disabled>
+                Use offset of half ADC reference
+              </label>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="control">
+              <label class="checkbox">
+                <input id="use-filter" type="checkbox">
+                Filter outliers
+              </label>
+            </div>
+          </div>
+
+        </div>
       </div>
 
     </div>
+
+    <div class="tile is-ancestor">
+
+      <div class="tile is-parent is-vertical is-5">
+        <div class="tile is-child box">
+          <div class="level">
+
+            <div class="level-item has-text-centered">
+              <div>
+                <p class="heading">Voltage min</p>
+                <p class="subtitle"><span id="voltage-min">-</span></p>
+              </div>
+            </div>
+
+            <div class="level-item has-text-centered">
+              <div>
+                <p class="heading">Voltage</p>
+                <p class="title"><span id="voltage">-</span></p>
+              </div>
+            </div>
+
+            <div class="level-item has-text-centered">
+              <div>
+                <p class="heading">Voltage max</p>
+                <p class="subtitle"><span id="voltage-max">-</span></p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="tile is-vertical is-parent is-2">
+        <div class="tile is-child box">
+          <div class="has-text-centered">
+            <p class="heading">Power</p>
+            <p class="title"><span id="power">-</span></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tile is-vertical is-parent is-5">
+        <div class="tile is-child box">
+          <div class="level">
+
+            <div class="level-item has-text-centered">
+              <div>
+                <p class="heading">Current min</p>
+                <p class="subtitle"><span id="current-min">-</span></p>
+              </div>
+            </div>
+
+            <div class="level-item has-text-centered">
+              <div>
+                <p class="heading">Current</p>
+                <p class="title"><span id="current">-</span></p>
+              </div>
+            </div>
+
+            <div class="level-item has-text-centered">
+              <div>
+                <p class="heading">Current max</p>
+                <p class="subtitle"><span id="current-max">-</span></p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tile is-ancestor">
+
+      <div class="tile is-vertical is-parent is-6">
+        <div class="tile is-child box">
+          <div id="voltage-chart" style="width: 100%; height: 400px"></div>
+        </div>
+      </div>
+
+      <div class="tile is-vertical is-parent is-6">
+        <div class="tile is-child box">
+          <div id="current-chart" style="width: 100%; height: 400px"></div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
 
   <script src="main.js"></script>
 </body>

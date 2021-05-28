@@ -112,9 +112,9 @@ const gui = {
 
       const success = await this.events.onConnectClick();
       if (success) {
-        this._elements.disconnectButton.disabled = false;
-        this._elements.connectButton.disabled = true;
-        this._elements.baudRateInput.disabled = true;
+        this._elements.disconnectButton.removeAttribute("disabled");
+        this._elements.connectButton.setAttribute("disabled", "true");
+        this._elements.baudRateInput.setAttribute("disabled", "true");
       }
     });
 
@@ -124,9 +124,9 @@ const gui = {
 
       const success = await this.events.onDisconnectClick();
       if (success) {
-        this._elements.disconnectButton.disabled = true;
-        this._elements.connectButton.disabled = false;
-        this._elements.baudRateInput.disabled = false;
+        this._elements.disconnectButton.setAttribute("disabled", "true");
+        this._elements.connectButton.removeAttribute("disabled");
+        this._elements.baudRateInput.removeAttribute("disabled");
       }
     });
 
@@ -150,25 +150,25 @@ const gui = {
         this._elements.portSelectElement.appendChild(optionElement);
       }
 
-      this._elements.baudRateInput.disabled = false;
-      this._elements.connectButton.disabled = false;
-      this._elements.disconnectButton.disabled = false;
+      this._elements.baudRateInput.removeAttribute("disabled");
+      this._elements.connectButton.removeAttribute("disabled");
+      this._elements.disconnectButton.removeAttribute("disabled");
     });
 
     this._elements.useGainCheckbox.addEventListener("change", () => {
       const checked = this._elements.useGainCheckbox.checked;
 
       if (checked) {
-        this._elements.acVoltageReference.disabled = true;
-        this._elements.offsetVoltageInput.disabled = false;
-        this._elements.opAmpGainInput.disabled = false;
-        this._elements.halfOffsetCheckbox.disabled = false;
+        this._elements.acVoltageReference.setAttribute("disabled", "true");
+        this._elements.offsetVoltageInput.removeAttribute("disabled");
+        this._elements.opAmpGainInput.removeAttribute("disabled");
+        this._elements.halfOffsetCheckbox.removeAttribute("disabled");
         this._elements.halfOffsetCheckbox.checked = false;
       } else {
-        this._elements.acVoltageReference.disabled = false;
-        this._elements.offsetVoltageInput.disabled = true;
-        this._elements.opAmpGainInput.disabled = true;
-        this._elements.halfOffsetCheckbox.disabled = true;
+        this._elements.acVoltageReference.removeAttribute("disabled");
+        this._elements.offsetVoltageInput.setAttribute("disabled", "true");
+        this._elements.opAmpGainInput.setAttribute("disabled", "true");
+        this._elements.halfOffsetCheckbox.setAttribute("disabled", "true");
         this._elements.halfOffsetCheckbox.checked = false;
       }
     });
@@ -177,9 +177,9 @@ const gui = {
       const checked = this._elements.halfOffsetCheckbox.checked;
 
       if (checked) {
-        this._elements.offsetVoltageInput.disabled = true;
+        this._elements.offsetVoltageInput.setAttribute("disabled", "true");
       } else {
-        this._elements.offsetVoltageInput.disabled = false;
+        this._elements.offsetVoltageInput.removeAttribute("disabled");
       }
     });
 
@@ -201,11 +201,13 @@ const gui = {
         name: xAxisName,
         nameLocation: "middle",
         type: "value",
+        nameGap:30,
       },
       yAxis: {
         name: yAxisName,
         nameLocation: "middle",
         type: "value",
+        nameGap:30,
       },
       series: [
         {
@@ -247,9 +249,9 @@ const gui = {
   },
 
   fakeDisconnectClick() {
-    this._elements.disconnectButton.disabled = true;
-    this._elements.connectButton.disabled = false;
-    this._elements.baudRateInput.disabled = false;
+    this._elements.disconnectButton.setAttribute("disabled", "true");
+    this._elements.connectButton.removeAttribute("disabled");
+    this._elements.baudRateInput.removeAttribute("disabled");
   },
 
   updateVoltageChart(data) {

@@ -230,7 +230,7 @@ const simpleScope = {
         gui.setCurrent((currentData.currentMax / Math.sqrt(2)).toFixed(3));
 
         const power = calculatePower(voltageData.voltageDataRaw, currentData.currentDataRaw);
-        gui.setPower(power);
+        gui.setPower(power.toFixed(2));
         this._powerRecorder
           .record(power)
           .then((message) => {
