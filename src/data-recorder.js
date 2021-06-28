@@ -13,7 +13,7 @@ class DataRecorder {
     return new Promise((resolve, reject) => {
       // store data
       this._records.push({
-        timestamp: new Date().toISOString(),
+        timestamp: new Date().toLocaleString("en-US"),
         value: value,
       });
 

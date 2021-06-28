@@ -1,5 +1,5 @@
 {
-  "productName":"SimpleScope",
+  "productName": "SimpleScope",
   "name": "simple_scope",
   "version": "1.0.0",
   "description": "",
@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron ./src/index.js",
     "rebuild": "electron-rebuild -f -w serialport",
-    "build":"electron-packager . --out './build/' --overwrite"
+    "build": "electron-packager . --out './build/' --overwrite"
   },
   "repository": {
     "type": "git",
