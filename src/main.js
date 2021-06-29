@@ -224,7 +224,7 @@ const simpleScope = {
         const averageVoltage =
           voltageData.voltageDataRaw.reduce((p, c) => p + Math.abs(c), 0) /
           voltageData.voltageDataRaw.length;
-        gui.setVoltage(averageVoltage);
+        gui.setVoltage(averageVoltage.toFixed(2));
 
         const currentData = this._createCurrentData(this._lastVoltageSamples[1]);
 
@@ -236,7 +236,7 @@ const simpleScope = {
         const averageCurrent =
           currentData.currentDataRaw.reduce((p, c) => p + Math.abs(c), 0) /
           currentData.currentDataRaw.length;
-        gui.setCurrent(averageCurrent);
+        gui.setCurrent(averageCurrent.toFixed(2));
 
         const power = calculatePower(voltageData.voltageDataRaw, currentData.currentDataRaw);
         gui.setPower(power.toFixed(2));
