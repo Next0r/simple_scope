@@ -19,6 +19,7 @@ const simpleScope = {
   _measurementIntervalHandler: undefined,
   _measurementsUpdateInterval: 1000,
   _acs723VoltPerAmpere: 0.4,
+  _voltageFrequency: 50,
   _powerRecorder: new DataRecorder({
     name: "power_record",
     directory: "power_records",
@@ -218,20 +219,26 @@ const simpleScope = {
         gui.updateVoltageChart(voltageData.voltageData);
         gui.setVoltageMin(voltageData.voltageMin.toFixed(2));
         gui.setVoltageMax(voltageData.voltageMax.toFixed(2));
-        // gui.setVoltage(
-        //   (((voltageData.voltageMax - voltageData.voltageMin) * 0.5) / Math.sqrt(2)).toFixed(2)
-        // );
-        const averageVoltage =
-          voltageData.voltageDataRaw.reduce((p, c) => p + Math.abs(c), 0) /
-          voltageData.voltageDataRaw.length;
-        gui.setVoltage(averageVoltage.toFixed(2));
+
+        const samplesPerPeriod = Math.ceil(gui.getMCUSamplingSpeed() / this._voltageFrequency);
+        
+        if (voltageData.voltageDataRaw.length >= samplesPerPeriod) {
+          const averageVoltage =
+            voltageData.voltageDataRaw.slice(0, 20).reduce((p, c) => p + Math.abs(c), 0) /
+            samplesPerPeriod;
+          gui.setVoltage(averageVoltage.toFixed(2));
+        } else {
+          const averageVoltage =
+            voltageData.voltageDataRaw.reduce((p, c) => p + Math.abs(c), 0) /
+            voltageData.voltageDataRaw.length;
+          gui.setVoltage(averageVoltage.toFixed(2));
+        }
 
         const currentData = this._createCurrentData(this._lastVoltageSamples[1]);
 
         gui.updateCurrentChart(currentData.currentData);
         gui.setCurrentMin(currentData.currentMin.toFixed(3));
         gui.setCurrentMax(currentData.currentMax.toFixed(3));
-        // gui.setCurrent((currentData.currentMax / Math.sqrt(2)).toFixed(3));
 
         const averageCurrent =
           currentData.currentDataRaw.reduce((p, c) => p + Math.abs(c), 0) /
@@ -291,22 +298,6 @@ const simpleScope = {
     this._setDisconnectEvent();
     this._setConnectEvent();
     this._setMeasurementUpdateInterval();
-
-    // const recorder = new DataRecorder({ name: "power", maxSize: 40 });
-
-    // let x = 0;
-
-    // setInterval(() => {
-    //   x += 1;
-    //   recorder
-    //     .record(x)
-    //     .then((msg) => {
-    //       gui.setAndViewFileSavedNotification(msg, { closeTimeout: 4000 });
-    //     })
-    //     .catch((err) => {
-    //       console.log(err);
-    //     });
-    // }, 500);
   },
 };
 
