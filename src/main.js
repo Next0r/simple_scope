@@ -22,7 +22,7 @@ const simpleScope = {
   _powerRecorder: new DataRecorder({
     name: "power_record",
     directory: "power_records",
-    maxSize: 3600,
+    maxSize: 300,
   }),
 
   _setConnectEvent() {
