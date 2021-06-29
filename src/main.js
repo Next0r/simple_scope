@@ -236,7 +236,7 @@ const simpleScope = {
         const averageCurrent =
           currentData.currentDataRaw.reduce((p, c) => p + Math.abs(c), 0) /
           currentData.currentDataRaw.length;
-        gui.setCurrent(averageCurrent.toFixed(2));
+        gui.setCurrent(averageCurrent.toFixed(3));
 
         const power = calculatePower(voltageData.voltageDataRaw, currentData.currentDataRaw);
         gui.setPower(power.toFixed(2));
