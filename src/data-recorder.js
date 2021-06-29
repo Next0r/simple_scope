@@ -11,9 +11,15 @@ class DataRecorder {
 
   record(value = "value") {
     return new Promise((resolve, reject) => {
+      // create timestamp
+      const date = new Date();
+      const timestamp = `${date.getFullYear()}/${
+        date.getMonth() + 1
+      }/${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()}`;
+
       // store data
       this._records.push({
-        timestamp: new Date().toLocaleString("en-US"),
+        timestamp: timestamp,
         value: value,
       });
 
