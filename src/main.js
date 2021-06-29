@@ -218,9 +218,13 @@ const simpleScope = {
         gui.updateVoltageChart(voltageData.voltageData);
         gui.setVoltageMin(voltageData.voltageMin.toFixed(2));
         gui.setVoltageMax(voltageData.voltageMax.toFixed(2));
-        gui.setVoltage(
-          (((voltageData.voltageMax - voltageData.voltageMin) * 0.5) / Math.sqrt(2)).toFixed(2)
-        );
+        // gui.setVoltage(
+        //   (((voltageData.voltageMax - voltageData.voltageMin) * 0.5) / Math.sqrt(2)).toFixed(2)
+        // );
+        const averageVoltage =
+          voltageData.voltageDataRaw.reduce((p, c) => p + Math.abs(c), 0) /
+          voltageData.voltageDataRaw.length;
+        gui.setVoltage(averageVoltage);
 
         const currentData = this._createCurrentData(this._lastVoltageSamples[1]);
 
