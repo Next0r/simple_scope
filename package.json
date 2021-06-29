@@ -9,7 +9,7 @@
     "start": "electron ./src/index.js",
     "rebuild": "electron-rebuild -f -w serialport",
     "build": "electron-packager . --out './build/' --overwrite",
-    "linuxStart":"electron ./src/index.js --no-sandbox"
+    "linuxStart": "electron ./src/index.js --no-sandbox"
   },
   "repository": {
     "type": "git",
@@ -33,5 +33,8 @@
     "fs-extra": "^8.1.0",
     "jquery": "^3.6.0",
     "serialport": "^9.0.7"
+  },
+  "prettier": {
+    "printWidth": 100
   }
 }

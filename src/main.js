@@ -227,7 +227,12 @@ const simpleScope = {
         gui.updateCurrentChart(currentData.currentData);
         gui.setCurrentMin(currentData.currentMin.toFixed(3));
         gui.setCurrentMax(currentData.currentMax.toFixed(3));
-        gui.setCurrent((currentData.currentMax / Math.sqrt(2)).toFixed(3));
+        // gui.setCurrent((currentData.currentMax / Math.sqrt(2)).toFixed(3));
+
+        const averageCurrent =
+          currentData.currentDataRaw.reduce((p, c) => p + Math.abs(c), 0) /
+          currentData.currentDataRaw.length;
+        gui.setCurrent(averageCurrent);
 
         const power = calculatePower(voltageData.voltageDataRaw, currentData.currentDataRaw);
         gui.setPower(power.toFixed(2));
