@@ -216,20 +216,7 @@ const simpleScope = {
         gui.setVoltageMin(voltageData.voltageMin.toFixed(2));
         gui.setVoltageMax(voltageData.voltageMax.toFixed(2));
 
-        const samplesPerPeriod = Math.ceil(gui.getMCUSamplingSpeed() / this._voltageFrequency);
-
-        if (voltageData.voltageDataRaw.length >= samplesPerPeriod) {
-          const averageVoltage =
-            voltageData.voltageDataRaw
-              .slice(0, samplesPerPeriod)
-              .reduce((p, c) => p + Math.abs(c), 0) / samplesPerPeriod;
-          gui.setVoltage(averageVoltage.toFixed(2));
-        } else {
-          const averageVoltage =
-            voltageData.voltageDataRaw.reduce((p, c) => p + Math.abs(c), 0) /
-            voltageData.voltageDataRaw.length;
-          gui.setVoltage(averageVoltage.toFixed(2));
-        }
+        gui.setVoltage((voltageData.voltageMax / Math.sqrt(2)).toFixed(2));
 
         const currentData = this._createCurrentData(this._lastVoltageSamples[1]);
 
