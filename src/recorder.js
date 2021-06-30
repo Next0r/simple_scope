@@ -33,7 +33,7 @@ const recorder = {
     return dataFilePath;
   },
 
-  record(value = "", { forceSave = false } = {}) {
+  record(value = "") {
     return new Promise((resolve, reject) => {
       const dirPath = path.join(__dirname, this._directory);
       const tmpFilePath = path.join(__dirname, this._directory, this._tmpFileName);
@@ -42,49 +42,32 @@ const recorder = {
 
       try {
         if (!fs.existsSync(dirPath)) {
-          // directory does not exists and force save then return
-          if (forceSave) {
-            resolve();
-            return;
-          }
-
           fs.mkdirSync(dirPath);
         }
 
         if (!fs.existsSync(tmpFilePath)) {
-          // tmp file does not exists and force save then return
-          if (forceSave) {
-            resolve();
-            return;
-          }
           fs.writeFileSync(tmpFilePath, "", { flag: "w+" });
         }
 
-        // force save does not put any data into tmp file
-        if (!forceSave) {
-          fs.appendFileSync(
-            tmpFilePath,
-            `${this._createTimestamp()},${value}${this._rowSeparator}\n`,
-            {
-              flag: "a",
-              encoding: "utf8",
-            }
-          );
-        }
+        fs.appendFileSync(
+          tmpFilePath,
+          `${this._createTimestamp()},${value}${this._rowSeparator}\n`,
+          {
+            flag: "a",
+            encoding: "utf8",
+          }
+        );
 
         tmpFileContent = fs.readFileSync(tmpFilePath, { flag: "r", encoding: "utf8" });
       } catch (e) {
         reject(e);
-        return;
       }
 
       const dataRows = tmpFileContent.replace(/\r?\n|\r/g, "").split(this._rowSeparator);
       dataRows.pop();
 
-      // skip if force save
-      if (dataRows.length < this._maxSize && !forceSave) {
-        resolve();
-        return;
+      if (dataRows.length < this._maxSize) {
+        return resolve();
       }
 
       const dataFileContent = [];
@@ -108,7 +91,6 @@ const recorder = {
         fs.rmSync(tmpFilePath);
       } catch (e) {
         reject(e);
-        return;
       }
 
       resolve(`Saved ${dataFilePath} with ${dataFileContent.length} records.`);

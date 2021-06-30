@@ -284,10 +284,6 @@ const simpleScope = {
     this._setDisconnectEvent();
     this._setConnectEvent();
     this._setMeasurementUpdateInterval();
-
-    process.on("exit", () => {
-      await this._powerRecorder.record("", { forceSave: true });
-    });
   },
 };
 
