@@ -4,7 +4,7 @@ const multiThreading = require("./multi-threading");
 const SerialDataProcessorMessage = require("./serial-data-processor-message");
 const hampel = require("./hampel");
 const calculatePower = require("./calculate-power");
-const DataRecorder = require("./data-recorder");
+const { recorder } = require("./recorder");
 
 const simpleScope = {
   /**
@@ -20,11 +20,7 @@ const simpleScope = {
   _measurementsUpdateInterval: 1000,
   _acs723VoltPerAmpere: 0.4,
   _voltageFrequency: 50,
-  _powerRecorder: new DataRecorder({
-    name: "power_record",
-    directory: "power_records",
-    maxSize: 300,
-  }),
+  _powerRecorder: recorder.init("records", 300),
 
   _setConnectEvent() {
     gui.events.onConnectClick = () => {
@@ -224,8 +220,9 @@ const simpleScope = {
 
         if (voltageData.voltageDataRaw.length >= samplesPerPeriod) {
           const averageVoltage =
-            voltageData.voltageDataRaw.slice(0, samplesPerPeriod).reduce((p, c) => p + Math.abs(c), 0) /
-            samplesPerPeriod;
+            voltageData.voltageDataRaw
+              .slice(0, samplesPerPeriod)
+              .reduce((p, c) => p + Math.abs(c), 0) / samplesPerPeriod;
           gui.setVoltage(averageVoltage.toFixed(2));
         } else {
           const averageVoltage =
@@ -250,7 +247,9 @@ const simpleScope = {
         this._powerRecorder
           .record(power)
           .then((message) => {
-            gui.setAndViewFileSavedNotification(message, { closeTimeout: 4000 });
+            if (message) {
+              gui.setAndViewFileSavedNotification(message, { closeTimeout: 4000 });
+            }
           })
           .catch((err) => {
             console.warn(err);
