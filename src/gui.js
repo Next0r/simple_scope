@@ -229,14 +229,14 @@ const gui = {
     this._voltageChart.setOption(
       this._createChartOption({
         title: "Measured voltage",
-        xAxisName: "Time, ms",
+        xAxisName: "Time, s",
         yAxisName: "Voltage, V",
       })
     );
     this._currentChart.setOption(
       this._createChartOption({
         title: "Measured current",
-        xAxisName: "Time, ms",
+        xAxisName: "Time, s",
         yAxisName: "Current, A",
       })
     );
